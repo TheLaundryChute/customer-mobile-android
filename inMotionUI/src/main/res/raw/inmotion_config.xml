@@ -1,0 +1,8 @@
+<inmotion>
+    <net>
+        <host>http://api.inmotionapptest.net/v1</host>
+    </net>
+    <clientId>ngAuthApp</clientId>
+    <organization>ten</organization>
+    <isCustomer>false</isCustomer>
+</inmotion>

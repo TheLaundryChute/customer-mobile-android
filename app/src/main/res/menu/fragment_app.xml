@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/home"
+        android:icon="@drawable/logo"
+        android:title="@string/home"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/messages"
+        android:icon="@drawable/envelope"
+        android:title="@string/messages"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/wash_history"
+        android:icon="@drawable/history"
+        android:title="@string/wash_history"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/user_profile"
+        android:icon="@drawable/user"
+        android:title="@string/user_profile"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/faq"
+        android:icon="@drawable/help"
+        android:title="@string/help"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/logout"
+        android:icon="@drawable/logout"
+        android:title="@string/logout"
+        app:showAsAction="always"/>
+</menu>

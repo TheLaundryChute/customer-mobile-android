@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+                android:layout_above="@id/toolbar_bottom"
+                android:background="@color/tlcDarkBlue">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="236dp"
+            android:orientation="horizontal">
+            <ImageButton
+                android:id="@+id/wash_previous"
+                android:layout_height="50dp"
+                android:layout_width="wrap_content"
+                android:src="@drawable/swipeleft"
+                android:background="@null"
+                android:onClick="previousWash"
+                android:layout_gravity="left|center_vertical" />
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <ImageView
+                    android:id="@+id/bag_image_view"
+                    android:layout_width="280dp"
+                    android:layout_height="200dp"
+                    android:src="@drawable/nobag"
+                    android:layout_marginTop="50dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp" />
+                <TextView android:id="@+id/wash_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@id/bag_image_view"
+                    android:layout_alignTop="@id/bag_image_view"
+                    android:layout_alignRight="@id/bag_image_view"
+                    android:gravity="center_vertical|bottom|center"
+                    android:textColor="#ab1515"
+                    android:textSize="25dp"
+                    android:background="@drawable/rounded_corner"
+                    android:layout_marginTop="-40dp"
+                    android:layout_marginLeft="80dp"
+                    android:layout_marginRight="80dp" />
+            </RelativeLayout>
+            <ImageButton
+                android:id="@+id/wash_next"
+                android:layout_height="50dp"
+                android:layout_width="wrap_content"
+                android:src="@drawable/swiperight"
+                android:background="@null"
+                android:onClick="nextWash"
+                android:layout_gravity="center_vertical|right" />
+        </LinearLayout>
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/action_help"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            style="@style/AppTheme.HelpAction">
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:weightSum="1">
+
+                <ImageView
+                    android:id="@+id/action_help_left_image"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="left|center_vertical"
+                    android:src="@drawable/help"/>
+
+                <me.grantland.widget.AutofitTextView
+                    android:id="@+id/wash_action"
+                    android:padding="4dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="ActionText"
+                    android:textColor="@color/white"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_weight="1.04" />
+
+                <ImageView
+                    android:id="@+id/action_help_right_image"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/arrow"
+                    android:layout_marginTop="5dp" />
+            </LinearLayout>
+
+        </LinearLayout>
+       <!-- <Button
+            android:id="@+id/wash_action"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/help"
+            android:drawableRight="@drawable/arrow"
+            android:text="You don't have any bags!">
+        </Button>-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="1">
+
+            <LinearLayout
+                android:id="@+id/actionOne"
+                android:layout_width="172dp"
+                android:layout_height="50dp"
+                style="@style/AppTheme.DefaultAction"
+                android:layout_gravity="left|center_vertical"
+                android:gravity="left">
+                <ImageView
+                    android:id="@+id/leftSubButtonImage"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:src="@drawable/gear" >
+                </ImageView>
+
+                <me.grantland.widget.AutofitTextView
+                    android:id="@+id/actionOneLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:clickable="false"
+                    android:text="Set Laundry Preferences"
+                    android:textColor="@color/white">
+                </me.grantland.widget.AutofitTextView>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/actionTwo"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                style="@style/AppTheme.DefaultAction"
+                android:layout_gravity="center_vertical|right"
+                android:gravity="left">
+
+                <ImageView
+                    android:id="@+id/rightSubButtonImage"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:src="@drawable/qrcode" >
+                </ImageView>
+
+                <me.grantland.widget.AutofitTextView
+                    android:id="@+id/actionTwoLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:clickable="false"
+                    android:text="Scan Bags"
+                    android:textColor="@color/white"
+                    />
+            </LinearLayout>
+
+
+        </LinearLayout>
+        <ImageView
+            android:id="@+id/wash_status"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:src="@drawable/step1"
+            android:layout_marginRight="16dp"
+            android:layout_marginLeft="16dp" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="9">
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:text="Expected Pickup Date Goes Here"
+                android:id="@+id/expectedDateTextView"
+                android:layout_marginTop="10dp"
+                android:textAlignment="center"
+                android:visibility="invisible" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/action_bottom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_above="@id/toolbar_bottom"
+            style="@style/AppTheme.HelpAction"
+            android:layout_gravity="left|bottom|right"
+            android:gravity="left|bottom|right"
+            android:layout_margin="0dp">
+            <TextView
+                android:id="@+id/action_notification"
+                android:padding="4dp"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="ActionText"
+                android:textColor="@color/white"
+                android:layout_gravity="center_horizontal"
+                android:textAlignment="center" />
+        </LinearLayout>
+
+
+    </LinearLayout>
+    <android.support.v7.widget.Toolbar
+    android:id="@+id/toolbar_bottom"
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:background="?attr/colorPrimary"
+    android:layout_alignParentBottom="true"
+    android:minHeight="?attr/actionBarSize"
+    android:layout_gravity="bottom" />
+</RelativeLayout>

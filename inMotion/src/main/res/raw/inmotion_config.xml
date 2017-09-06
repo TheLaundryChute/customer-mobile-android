@@ -1,0 +1,9 @@
+<inmotion>
+    <net>
+        <!--<host>http://api.inmotionapptest.net/v1/</host>-->
+        <host>http://whittaker.inmotionapptest.net/api/v1/</host>
+    </net>
+    <clientId>ngAuthApp</clientId>
+    <organization>prostaff</organization>
+    <isCustomer>true</isCustomer>
+</inmotion>

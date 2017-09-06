@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.thelaundrychute.user.test">
+
+    <uses-feature
+        android:glEsVersion="0x00020000"
+        android:required="true" />
+
+
+    <uses-permission android:name="com.example.permission.MAPS_RECEIVE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.READ_PROFILE" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+
+    <permission
+        android:name="com.thelaundrychute.user.test.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+
+    <uses-permission android:name="com.thelaundrychute.user.test.permission.C2D_MESSAGE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <application
+        android:name="com.inMotion.ui.InMotionApplication"
+        android:allowBackup="true"
+        android:icon="@drawable/icon"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+
+        <uses-library android:name="com.google.android.maps" />
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBNLCwXk31sI7KoebBXoZAkhoCFCRXKd1k" />
+
+        <activity
+            android:name="com.thelaundrychute.user.wash.WashPagerActivity"
+            android:label="@string/app_name"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name="com.thelaundrychute.user.UpgradeActivity"
+            android:screenOrientation="portrait">
+            </activity>
+        <activity
+            android:name="com.thelaundrychute.user.common.web.WebActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.thelaundrychute.user.bag.BagScanActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.thelaundrychute.user.MainActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.thelaundrychute.user.TLCLoginActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.thelaundrychute.user.Unauth"
+            android:screenOrientation="portrait" />
+
+        <service
+            android:name="com.thelaundrychute.user.common.MyInstanceIDService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.android.gms.iid.InstanceID" />
+            </intent-filter>
+        </service>
+        <service
+            android:name="com.thelaundrychute.user.common.NotificationListenerService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+            </intent-filter>
+        </service>
+
+        <receiver
+            android:name="com.google.android.gms.gcm.GcmReceiver"
+            android:exported="true"
+            android:permission="com.google.android.c2dm.permission.SEND">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+
+                <category android:name="com.example.gcm" />
+            </intent-filter>
+        </receiver>
+
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="a06f3321ac4e1035dd648de28320f4d6ac344cca" />
+
+        <activity
+            android:name="com.thelaundrychute.user.wash.WashReview"
+            android:label="@string/title_activity_wash_review"
+            android:theme="@style/modalTheme" />
+        <activity
+            android:name="com.thelaundrychute.user.wash.WashComments"
+            android:label="@string/title_activity_wash_comments"
+            android:theme="@style/modalTheme" />
+        <activity
+            android:name="com.thelaundrychute.user.bag.ReuseBagActivity"
+            android:label="@string/title_activity_reuse_bag"
+            android:theme="@style/modalTheme" />
+        <activity
+            android:name="com.thelaundrychute.user.NoInternetActivity"
+            android:label="@string/title_activity_no_internet"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+    </application>
+
+</manifest>

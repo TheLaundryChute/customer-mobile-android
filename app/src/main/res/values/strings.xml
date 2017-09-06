@@ -1,0 +1,40 @@
+<resources>
+    <string name="app_name">TLC</string>
+    <string name="gcm_project_number">325820962498</string>
+    <string name="gcm_project_id">consumerapp-1161</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="done">Done!</string>
+    <string name="action_settings">Settings</string>
+    <string name="bag_title_hint">Enter a title for the bag.</string>
+    <string name="date_picker_title">Date of Wash:</string>
+    <string name="new_wash">New Wash</string>
+    <string name="show_subtitle">Show Subtitle</string>
+    <string name="hide_subtitle">Hide Subtitle</string>
+    <string name="subtitle_format">%1$s washes</string>
+    <string name="wash_suspect_text">Choose Suspect</string>
+    <string name="wash_report_text">Send Wash Report</string>
+    <string name="action_sign_in">Login</string>
+    <string name="action_register">Register</string>
+    <string name="prompt_password">Password</string>
+    <string name="title_activity_un_auth">UnAuth</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+
+    <string name="title_activity_auth">Auth</string>
+    <string name="NavigateBack">&#8592;</string>
+    <string name="home">Home</string>
+    <string name="messages">Messages</string>
+    <string name="wash_history">Wash History</string>
+    <string name="user_profile">User Profile</string>
+    <string name="help">Help</string>
+    <string name="new_bag">New Bag</string>
+    <string name="logout">Logout</string>
+
+    <color name="tlcLogoRed">#8D1E1C</color>
+    <color name="tlcBlue">#506A8A</color>
+    <color name="tlcDarkBlue">#23476A</color>
+    <string name="title_activity_wash_review">WashReview</string>
+    <string name="title_activity_wash_comments">WashComments</string>
+    <string name="title_activity_reuse_bag">ReuseBagActivity</string>
+    <string name="title_activity_no_internet">NoInternetActivity</string>
+</resources>

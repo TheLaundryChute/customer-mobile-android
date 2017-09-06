@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="0dp"
+    android:paddingRight="0dp"
+    android:paddingTop="0dp"
+    android:paddingBottom="0dp"
+    android:orientation="vertical"
+    tools:context="com.thelaundrychute.user.Auth">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <ImageButton
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:src="@drawable/arrow"
+            android:scaleX="-1"
+            android:onClick="selfDestruct" />
+        <ImageView
+            android:layout_width="400px"
+            android:layout_height="450px"
+            android:src="@drawable/bag"
+            />
+        <ImageButton
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:src="@drawable/arrow"
+            android:onClick="selfDestruct" />
+    </LinearLayout>
+    <Button
+        android:id="@+id/button3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableLeft="@android:drawable/btn_star_big_on"
+        android:drawableRight="@android:drawable/btn_star_big_on"
+        android:text="You don't have any bags!">
+    </Button>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/button1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@android:drawable/btn_star_big_on"
+            android:text="Set Laundry Preferences">
+        </Button>
+        <Button
+            android:id="@+id/button2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@android:drawable/btn_star_big_on"
+            android:text="Scan Bags">
+        </Button>
+    </LinearLayout>
+
+
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar_bottom"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:background="?attr/colorPrimary"
+        android:layout_alignParentBottom="true"
+        android:minHeight="?attr/actionBarSize" />
+</LinearLayout>

@@ -1,0 +1,13 @@
+<inmotion>
+    <net>
+
+        <host>https://tlc.inmotionapptest.net/api/v1/</host>
+        <web>https://tlc-v2.inmotionapptest.net/</web>
+
+        <!--<host>https://api.thelaundrychute.com/api/v1/</host>
+        <web>https://mobileweb.thelaundrychute.com/</web><!-->
+   </net>
+   <clientId>ngAuthApp</clientId>
+   <organization>tlc</organization>
+   <isCustomer>true</isCustomer>
+</inmotion>
