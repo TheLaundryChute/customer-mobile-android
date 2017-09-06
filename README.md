@@ -1,1 +1,1 @@
-# customer-android
+# customer-mobile-android
