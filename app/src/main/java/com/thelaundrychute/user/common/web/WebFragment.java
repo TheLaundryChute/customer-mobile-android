@@ -228,6 +228,7 @@ public class WebFragment extends Fragment {
                 .appendQueryParameter("isWebView", "true")
                 .appendQueryParameter("token", token)
                 .build().toString();
+        uri = "file:///android_asset/index.html";
         mWebView.loadUrl(uri);
         //mWebView.setBackgroundColor(Color.argb(1, 0, 0, 0));
         return view;
