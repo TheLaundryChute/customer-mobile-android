@@ -40,10 +40,6 @@ public class MainActivity extends BaseAppCompatActivity implements IBaseActivity
         super.onCreate(savedInstanceState);
         Fabric.with(this, new Crashlytics(), new CrashlyticsNdk());
 
-
-        //TODO: this needs moved to happen before app loads
-        TranslationService.init();
-
         com.inMotion.session.Context.init(this);
 
         //Check to see if the application is obsolete.  If so, redirect the user to the upgrade screen
@@ -86,53 +82,13 @@ public class MainActivity extends BaseAppCompatActivity implements IBaseActivity
             Intent intent = new Intent(this,UpgradeActivity.class);
             startActivity(intent);
         }else {
-            Log.d("else", "failure");
+            Intent intent = WebActivity.newIntent(MainActivity.this, WebPages.HOME);
 
-
-            Boolean isLoggedIn = com.inMotion.session.Context.getCurrent().getUser() != null;
-            if (isLoggedIn) {
-                getCurrent getCurrentUserRequest = new getCurrent();
-
-                getCurrentUserRequest.execute(null, new INetFunctionDelegate<emptyFuncRequest, getCurrent.response>() {
-                    @Override
-                    public void netFunctionDidFail(NetFunction<emptyFuncRequest, getCurrent.response> function, com.inMotion.core.Error error) {
-                        //We can't do anything without the current user
-                        Log.d("login", error.getMessage());
-                    }
-
-                    @Override
-                    public void netFunctionDidSucceed(NetFunction<emptyFuncRequest, getCurrent.response> function, FuncResponse<getCurrent.response> result) {
-                        getCurrent.response data = result.getData();
-                        UserHelper.setUser(data.getUser());
-                        UserHelper.setUserMessage(data.getDetails().getActionItem().getMessage());
-                        UserHelper.setActionItem(data.getDetails().getActionItem());
-                        /*
-                        List<Wash> washes = UserHelper.getActiveUserWashes();
-                        long washId = -1;
-                        if (washes.size() > 0) {
-                            washId = washes.get(0).getId();
-                        }
-
-                        Intent intent = WashPagerActivity.newIntent(MainActivity.this, washId);*/
-                        Intent intent = WebActivity.newIntent(MainActivity.this, WebPages.HOME);
-
-                        startActivity(intent);
-                        MainActivity.this.finish();
-                    }
-                });
-
-            } else {
-                Intent i = new Intent(MainActivity.this, TLCLoginActivity.class);
-                startActivity(i);
-                this.finish();
-            }
+            startActivity(intent);
+            MainActivity.this.finish();
 
             NetworkManager.getInstance().start(getApplicationContext());
         }
     }
 
-    @Override
-    public boolean getRequiresUser() {
-        return false;
-    }
 }

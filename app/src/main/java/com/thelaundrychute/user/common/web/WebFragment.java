@@ -27,6 +27,8 @@ import android.webkit.WebView;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 import com.inMotion.core.Error;
 import com.inMotion.core.config.AppConfig;
 import com.inMotion.core.net.repositories.delegates.INetFunctionDelegate;
@@ -35,13 +37,14 @@ import com.inMotion.core.net.repositories.funcs.NetFunction;
 import com.inMotion.core.net.repositories.funcs.emptyFuncRequest;
 import com.thelaundrychute.business.user.functions.getCurrent;
 import com.thelaundrychute.user.bag.BagScanActivity;
+import com.thelaundrychute.user.bag.BagScanFragment;
 import com.thelaundrychute.user.bag.BagScanType;
 import com.thelaundrychute.user.common.ErrorPopup;
 import com.thelaundrychute.user.common.PinAlertDialog;
 
+import com.thelaundrychute.user.common.fragments.FragmentIntentIntegrator;
 import com.thelaundrychute.user.test.R;
 import com.thelaundrychute.user.TLCLoginActivity;
-import com.thelaundrychute.user.common.Toolbar;
 import com.thelaundrychute.user.common.TranslationService;
 import com.thelaundrychute.user.user.UserHelper;
 //import com.thelaundrychute.user.wash.WashPagerActivity;
@@ -131,6 +134,7 @@ public class WebFragment extends Fragment {
                 callback.invoke(origin, true, false);
             }
 
+
             @Override
             public void onReceivedTitle(WebView view, String title) {
                 super.onReceivedTitle(view, title);
@@ -208,6 +212,7 @@ public class WebFragment extends Fragment {
         JavaScriptInterface jsInterface = new JavaScriptInterface(getActivity());
         mWebView.addJavascriptInterface(jsInterface, "TLCAndroidInterface");
 
+
         String token = "";
         if (com.inMotion.session.Context.getCurrent().getAuthorization() != null) {
             token = com.inMotion.session.Context.getCurrent().getAuthorization().getAccess_token();
@@ -224,9 +229,7 @@ public class WebFragment extends Fragment {
                 .appendQueryParameter("token", token)
                 .build().toString();
         mWebView.loadUrl(uri);
-        mWebView.setBackgroundColor(Color.argb(1, 0, 0, 0));
-        updateUI();
-
+        //mWebView.setBackgroundColor(Color.argb(1, 0, 0, 0));
         return view;
     }
 
@@ -286,32 +289,6 @@ public class WebFragment extends Fragment {
         } else {
             return false;
         }
-    }
-
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        updateUI();
-    }
-
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-
-        inflater.inflate(R.menu.fragment_wash_list, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        return Toolbar.onOptionsItemSelected(getActivity(), item);
-    }
-
-
-
-    private void updateUI() {
-
     }
 
     public void successUserUpdate() {
@@ -401,6 +378,50 @@ public class WebFragment extends Fragment {
                 }
             });
             successUserUpdate();
+        }
+
+        @JavascriptInterface
+        public String activateScanner(String bagId) {
+            // Called when a user select continue on the confirm wash page. All that is needed is the bagId).
+
+            //Intent intent = BagScanActivity.newIntent(getActivity(), BagScanType.DROP_OFF_BAG, bagId, null);
+           // startActivity(intent);
+            //getActivity().finish();
+
+            BagScanFragment scanFragment = new BagScanFragment();
+            IntentIntegrator integrator = new FragmentIntentIntegrator(scanFragment);
+            integrator.initiateScan();
+            return "";
+
+        }
+
+        @JavascriptInterface
+        public void onLogin(String bagId) {
+            // TODO: This needs to invoke the login to register the device's id for notifications
+
+        }
+
+        public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+            IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
+            if (scanResult.getContents() == null) {
+                //Error handling here
+                ErrorPopup error = new ErrorPopup(getActivity(), "Error", "Didn't get the code", new ErrorPopup.ErrorPopupDelegate() {
+                    @Override
+                    public void alertClosed() {
+                    }
+                });
+                error.show();
+
+                return;
+            }
+
+
+            // This is all from bag scan fragment
+
+            Uri uri = Uri.parse(scanResult.getContents());
+            String bagId = uri.getQueryParameter("bagId");
+            String binId = uri.getQueryParameter("binId");
+
         }
     }
 
