@@ -5,12 +5,14 @@ import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.AssetManager;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -23,7 +25,10 @@ import android.webkit.GeolocationPermissions;
 import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceResponse;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
@@ -36,6 +41,7 @@ import com.inMotion.core.net.repositories.funcs.FuncResponse;
 import com.inMotion.core.net.repositories.funcs.NetFunction;
 import com.inMotion.core.net.repositories.funcs.emptyFuncRequest;
 import com.thelaundrychute.business.user.functions.getCurrent;
+import com.thelaundrychute.user.MainActivity;
 import com.thelaundrychute.user.bag.BagScanActivity;
 import com.thelaundrychute.user.bag.BagScanFragment;
 import com.thelaundrychute.user.bag.BagScanType;
@@ -47,12 +53,19 @@ import com.thelaundrychute.user.test.R;
 import com.thelaundrychute.user.TLCLoginActivity;
 import com.thelaundrychute.user.common.TranslationService;
 import com.thelaundrychute.user.user.UserHelper;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.concurrent.Callable;
 //import com.thelaundrychute.user.wash.WashPagerActivity;
 
 public class WebFragment extends Fragment {
     public static final String ARG_WEB_TARGET = "web_target";
     private CustomWebView mWebView;
     private String mWebTarget;
+
+    private static String qr_data = "";
+    public static int WEB_APP = 0;
 
     private ValueCallback<Uri> mUploadMessage;
     public ValueCallback<Uri[]> uploadMessage;
@@ -129,10 +142,12 @@ public class WebFragment extends Fragment {
         mWebView = (CustomWebView) view.findViewById(R.id.common_webview);
         mWebView.setGestureDetector(gesture);
 
+
         mWebView.setWebChromeClient(new WebChromeClient() {
             public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
                 callback.invoke(origin, true, false);
             }
+
 
 
             @Override
@@ -201,16 +216,25 @@ public class WebFragment extends Fragment {
             }
         });
 
-        mWebView.getSettings().setJavaScriptEnabled(true);
-        // HTML5 API flags
-        mWebView.getSettings().setAppCacheEnabled(true);
-        mWebView.getSettings().setDatabaseEnabled(true);
-        mWebView.getSettings().setDomStorageEnabled(true);
-        mWebView.getSettings().setAllowFileAccess(true);
-        mWebView.getSettings().setAllowContentAccess(true);
+        //mWebView.setWebViewClient( new  CustomWebViewClient(getActivity().getAssets()));
 
-        JavaScriptInterface jsInterface = new JavaScriptInterface(getActivity());
-        mWebView.addJavascriptInterface(jsInterface, "TLCAndroidInterface");
+        WebSettings webSettings = mWebView.getSettings();
+
+        webSettings.setJavaScriptEnabled(true);
+        // HTML5 API flags
+        webSettings.setAppCacheEnabled(true);
+        webSettings.setDatabaseEnabled(true);
+        webSettings.setDomStorageEnabled(true);
+        webSettings.setAllowFileAccess(true);
+        webSettings.setAllowContentAccess(true);
+
+        webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
+        if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
+            webSettings.setAllowFileAccessFromFileURLs(true);
+            webSettings.setAllowUniversalAccessFromFileURLs(true);
+        }
+        JavaScriptInterface jsInterface = new JavaScriptInterface(getActivity(), mWebView);
+        mWebView.addJavascriptInterface(jsInterface, "AndroidInterface");
 
 
         String token = "";
@@ -228,7 +252,7 @@ public class WebFragment extends Fragment {
                 .appendQueryParameter("isWebView", "true")
                 .appendQueryParameter("token", token)
                 .build().toString();
-        uri = "file:///android_asset/index.html";
+        uri = "file:///android_asset/troubleshoot/index.html";
         mWebView.loadUrl(uri);
         //mWebView.setBackgroundColor(Color.argb(1, 0, 0, 0));
         return view;
@@ -237,6 +261,27 @@ public class WebFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent intent)
     {
+        IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
+        if (scanResult.getContents() == null) {
+            //Error handling here
+//            ErrorPopup error = new ErrorPopup(getActivity(), "Error", "Didn't get the code", new ErrorPopup.ErrorPopupDelegate() {
+//                @Override
+//                public void alertClosed() {
+//                }
+//            });
+//            error.show();
+//
+//            return;
+        } else {
+
+            Uri uri = Uri.parse(scanResult.getContents());
+            qr_data = uri.getQueryParameter("bagId");
+        }
+
+        WEB_APP = 0;
+
+
+
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
         {
             if (requestCode == REQUEST_SELECT_FILE)
@@ -343,22 +388,28 @@ public class WebFragment extends Fragment {
                 });
             }
         });
+
+
     }
 
     public class JavaScriptInterface {
         Context mContext;
+        WebView mWebview;
 
-        /** Instantiate the interface and set the context */
-        JavaScriptInterface(Context c) {
+        public JavaScriptInterface(Context c, WebView webview) {
+            mWebview = webview;
             mContext = c;
         }
 
+
         @JavascriptInterface
-        public void loginActivity(String emailAddress)
+        public boolean loginActivity(String emailAddress)
         {
             Intent i = new Intent(getActivity(), TLCLoginActivity.class);
             startActivity(i);
             getActivity().finish();
+
+            return true;
         }
 
         @JavascriptInterface
@@ -382,48 +433,32 @@ public class WebFragment extends Fragment {
         }
 
         @JavascriptInterface
-        public String activateScanner(String bagId) {
-            // Called when a user select continue on the confirm wash page. All that is needed is the bagId).
-
-            //Intent intent = BagScanActivity.newIntent(getActivity(), BagScanType.DROP_OFF_BAG, bagId, null);
-           // startActivity(intent);
-            //getActivity().finish();
-
-            BagScanFragment scanFragment = new BagScanFragment();
-            IntentIntegrator integrator = new FragmentIntentIntegrator(scanFragment);
-            integrator.initiateScan();
-            return "";
-
-        }
-
-        @JavascriptInterface
         public void onLogin(String bagId) {
             // TODO: This needs to invoke the login to register the device's id for notifications
 
         }
 
-        public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-            IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
-            if (scanResult.getContents() == null) {
-                //Error handling here
-                ErrorPopup error = new ErrorPopup(getActivity(), "Error", "Didn't get the code", new ErrorPopup.ErrorPopupDelegate() {
-                    @Override
-                    public void alertClosed() {
+        @JavascriptInterface
+        public JSPromise activateScanner() {
+            return new JSPromise(new Callable() {
+                @Override
+                public String call() throws Exception {
+                    WEB_APP = 1;
+                    try {
+                        IntentIntegrator integrator = new FragmentIntentIntegrator(WebFragment.this);
+                        integrator.initiateScan();
+                    } catch(Exception ex) {
+                        Toast.makeText(mContext, "error: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
                     }
-                });
-                error.show();
 
-                return;
-            }
+                    while(WEB_APP == 1) {}
 
-
-            // This is all from bag scan fragment
-
-            Uri uri = Uri.parse(scanResult.getContents());
-            String bagId = uri.getQueryParameter("bagId");
-            String binId = uri.getQueryParameter("binId");
-
+                    return qr_data;
+                }
+            }).setWebView(mWebview);
         }
+
+
     }
 
 }
