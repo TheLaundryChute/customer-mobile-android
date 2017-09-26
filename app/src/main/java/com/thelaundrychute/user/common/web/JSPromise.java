@@ -28,7 +28,7 @@ public class JSPromise {
     private Object value = null;
 
     private String mCallbackJavaScript;
-    private boolean removeJavaScriptMethodAfterCallback = false;
+    private boolean removeJavaScriptMethodAfterCallback = true;
 
     public JSPromise(Callable callable) {
         this(null, callable);

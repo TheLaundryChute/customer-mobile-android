@@ -148,59 +148,59 @@ public class WebFragment extends Fragment {
         mWebView = (CustomWebView) view.findViewById(R.id.common_webview);
         mWebView.setGestureDetector(gesture);
 
-        mWebView.setOnTouchListener(new View.OnTouchListener() {
-            Handler handler = new Handler();
-
-            int numberOfTaps = 0;
-            long lastTapTimeMs = 0;
-            long touchDownMs = 0;
-
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        touchDownMs = System.currentTimeMillis();
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        handler.removeCallbacksAndMessages(null);
-
-                        if ((System.currentTimeMillis() - touchDownMs) > ViewConfiguration.getTapTimeout()) {
-                            //it was not a tap
-
-                            numberOfTaps = 0;
-                            lastTapTimeMs = 0;
-                            break;
-                        }
-
-                        if (numberOfTaps > 0
-                                && (System.currentTimeMillis() - lastTapTimeMs) < ViewConfiguration.getDoubleTapTimeout()) {
-                            numberOfTaps += 1;
-                        } else {
-                            numberOfTaps = 1;
-                        }
-
-                        lastTapTimeMs = System.currentTimeMillis();
-
-                        if (numberOfTaps == 3) {
-                            String uri = "file:///android_asset/troubleshoot/index.html";
-                            mWebView.loadUrl(uri);
-                            Toast.makeText(getActivity(), "triple", Toast.LENGTH_SHORT).show();
-                            //handle triple tap
-                        } else if (numberOfTaps == 2) {
-                            handler.postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    //handle double tap
-                                    Toast.makeText(getActivity(), "double", Toast.LENGTH_SHORT).show();
-                                }
-                            }, ViewConfiguration.getDoubleTapTimeout());
-                        }
-                }
-
-                return true;
-            }
-        });
+//        mWebView.setOnTouchListener(new View.OnTouchListener() {
+//            Handler handler = new Handler();
+//
+//            int numberOfTaps = 0;
+//            long lastTapTimeMs = 0;
+//            long touchDownMs = 0;
+//
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//
+//                switch (event.getAction()) {
+//                    case MotionEvent.ACTION_DOWN:
+//                        touchDownMs = System.currentTimeMillis();
+//                        break;
+//                    case MotionEvent.ACTION_UP:
+//                        handler.removeCallbacksAndMessages(null);
+//
+//                        if ((System.currentTimeMillis() - touchDownMs) > ViewConfiguration.getTapTimeout()) {
+//                            //it was not a tap
+//
+//                            numberOfTaps = 0;
+//                            lastTapTimeMs = 0;
+//                            break;
+//                        }
+//
+//                        if (numberOfTaps > 0
+//                                && (System.currentTimeMillis() - lastTapTimeMs) < ViewConfiguration.getDoubleTapTimeout()) {
+//                            numberOfTaps += 1;
+//                        } else {
+//                            numberOfTaps = 1;
+//                        }
+//
+//                        lastTapTimeMs = System.currentTimeMillis();
+//
+//                        if (numberOfTaps == 3) {
+//                            String uri = "file:///android_asset/troubleshoot/index.html";
+//                            mWebView.loadUrl(uri);
+//                            Toast.makeText(getActivity(), "triple", Toast.LENGTH_SHORT).show();
+//                            //handle triple tap
+//                        } else if (numberOfTaps == 2) {
+//                            handler.postDelayed(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    //handle double tap
+//                                    Toast.makeText(getActivity(), "double", Toast.LENGTH_SHORT).show();
+//                                }
+//                            }, ViewConfiguration.getDoubleTapTimeout());
+//                        }
+//                }
+//
+//                return true;
+//            }
+//        });
 
         mWebView.setWebChromeClient(new WebChromeClient() {
             public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
@@ -275,8 +275,6 @@ public class WebFragment extends Fragment {
             }
         });
 
-        //mWebView.setWebViewClient( new  CustomWebViewClient(getActivity().getAssets()));
-
         WebSettings webSettings = mWebView.getSettings();
 
         webSettings.setJavaScriptEnabled(true);
@@ -311,9 +309,11 @@ public class WebFragment extends Fragment {
                 .appendQueryParameter("isWebView", "true")
                 .appendQueryParameter("token", token)
                 .build().toString();
-        uri = "file:///android_asset/app/index.html";
+        //uri = "file:///android_asset/troubleshoot/index.html";
+
         mWebView.loadUrl(uri);
-        mWebView.loadUrl(uri);
+
+
         //mWebView.setBackgroundColor(Color.argb(1, 0, 0, 0));
         return view;
     }
@@ -531,7 +531,9 @@ public class WebFragment extends Fragment {
                         Toast.makeText(mContext, "error: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
                     }
 
-                    while(WEB_APP == 1) {}
+                    while(WEB_APP == 1) {
+                        Thread.sleep(200);
+                    }
 
                      return qr_data;
                 }

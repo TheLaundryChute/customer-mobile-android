@@ -6,10 +6,11 @@ angular.module("troubleshoot", []).controller("HomeController", ["$scope",  func
         run.then = callback => {
             var name = "callback_"+Math.floor((Math.random() * 100000));
             window[name] = callback
-            return run.thenJS(name);
+            return run.thenJS(name, true);
         }
         
         run.then((a) => {
+            alert(a);
             $scope.$apply(() => {                
                 context.barcodeResponse = a;
             });
