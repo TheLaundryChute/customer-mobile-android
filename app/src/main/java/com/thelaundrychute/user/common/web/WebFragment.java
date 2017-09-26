@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.Log;
@@ -20,6 +21,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.webkit.GeolocationPermissions;
 import android.webkit.JavascriptInterface;
@@ -40,12 +42,14 @@ import com.inMotion.core.net.repositories.delegates.INetFunctionDelegate;
 import com.inMotion.core.net.repositories.funcs.FuncResponse;
 import com.inMotion.core.net.repositories.funcs.NetFunction;
 import com.inMotion.core.net.repositories.funcs.emptyFuncRequest;
+import com.inMotion.entities.common.app.AppVersion;
 import com.thelaundrychute.business.user.functions.getCurrent;
 import com.thelaundrychute.user.MainActivity;
 import com.thelaundrychute.user.bag.BagScanActivity;
 import com.thelaundrychute.user.bag.BagScanFragment;
 import com.thelaundrychute.user.bag.BagScanType;
 import com.thelaundrychute.user.common.ErrorPopup;
+import com.thelaundrychute.user.common.GCMHelper;
 import com.thelaundrychute.user.common.PinAlertDialog;
 
 import com.thelaundrychute.user.common.fragments.FragmentIntentIntegrator;
@@ -100,6 +104,8 @@ public class WebFragment extends Fragment {
         this.validateUser();
     }
 
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -142,6 +148,59 @@ public class WebFragment extends Fragment {
         mWebView = (CustomWebView) view.findViewById(R.id.common_webview);
         mWebView.setGestureDetector(gesture);
 
+        mWebView.setOnTouchListener(new View.OnTouchListener() {
+            Handler handler = new Handler();
+
+            int numberOfTaps = 0;
+            long lastTapTimeMs = 0;
+            long touchDownMs = 0;
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        touchDownMs = System.currentTimeMillis();
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        handler.removeCallbacksAndMessages(null);
+
+                        if ((System.currentTimeMillis() - touchDownMs) > ViewConfiguration.getTapTimeout()) {
+                            //it was not a tap
+
+                            numberOfTaps = 0;
+                            lastTapTimeMs = 0;
+                            break;
+                        }
+
+                        if (numberOfTaps > 0
+                                && (System.currentTimeMillis() - lastTapTimeMs) < ViewConfiguration.getDoubleTapTimeout()) {
+                            numberOfTaps += 1;
+                        } else {
+                            numberOfTaps = 1;
+                        }
+
+                        lastTapTimeMs = System.currentTimeMillis();
+
+                        if (numberOfTaps == 3) {
+                            String uri = "file:///android_asset/troubleshoot/index.html";
+                            mWebView.loadUrl(uri);
+                            Toast.makeText(getActivity(), "triple", Toast.LENGTH_SHORT).show();
+                            //handle triple tap
+                        } else if (numberOfTaps == 2) {
+                            handler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    //handle double tap
+                                    Toast.makeText(getActivity(), "double", Toast.LENGTH_SHORT).show();
+                                }
+                            }, ViewConfiguration.getDoubleTapTimeout());
+                        }
+                }
+
+                return true;
+            }
+        });
 
         mWebView.setWebChromeClient(new WebChromeClient() {
             public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
@@ -252,11 +311,14 @@ public class WebFragment extends Fragment {
                 .appendQueryParameter("isWebView", "true")
                 .appendQueryParameter("token", token)
                 .build().toString();
-        uri = "file:///android_asset/troubleshoot/index.html";
+        uri = "file:///android_asset/app/index.html";
+        mWebView.loadUrl(uri);
         mWebView.loadUrl(uri);
         //mWebView.setBackgroundColor(Color.argb(1, 0, 0, 0));
         return view;
     }
+
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent intent)
@@ -433,9 +495,27 @@ public class WebFragment extends Fragment {
         }
 
         @JavascriptInterface
-        public void onLogin(String bagId) {
-            // TODO: This needs to invoke the login to register the device's id for notifications
+        public JSPromise getDeviceId() throws Exception {
+            return new JSPromise(new Callable() {
+                @Override
+                public String call() throws Exception {
+                    GCMHelper gcmRegistrationHelper = new GCMHelper(mContext.getApplicationContext());
+                    String projectNumber = getResources().getString(R.string.gcm_project_number);
+                    String gcmRegID = gcmRegistrationHelper.GCMRegister(projectNumber);
 
+                    return gcmRegID;
+                }
+            }).setWebView(mWebview);
+        }
+
+        @JavascriptInterface
+        public JSPromise getApplicationVersion() throws Exception {
+            return new JSPromise(new Callable() {
+                @Override
+                public String call() throws Exception {
+                    return AppVersion.appVersion(mContext);
+                }
+            }).setWebView(mWebview);
         }
 
         @JavascriptInterface
@@ -453,10 +533,12 @@ public class WebFragment extends Fragment {
 
                     while(WEB_APP == 1) {}
 
-                    return qr_data;
+                     return qr_data;
                 }
             }).setWebView(mWebview);
         }
+
+
 
 
     }

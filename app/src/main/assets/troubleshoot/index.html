@@ -9,154 +9,38 @@
     <div style="height:750px;overflow-y:auto">
 
         <h3>Initiate Barcode Scanner Request</h3>
-        <h5>GET http://tlc-locker/reset</h5>
-        <input type="button" value="Send Reset Request" ng-click="ctl.doBarcode()">
+        <h5>AndroidInterface.activateScanner()</h5>
+        <input type="button" value="Execute" ng-click="ctl.activateScanner()">
         </br />
 
-        <h4> Request</h4>
-        <code>{}</code>
-
         <h4> Response</h4>
-        <code ng-show="ctl.responseReset">{{ctl.responseStatus}}</code>
-        <code ng-hide="ctl.responseReset">No response yet</code>
+        The response here:
+        <div ng-show="ctl.barcodeResponse">{{ctl.barcodeResponse}}</div>
+        <code ng-hide="ctl.barcodeResponse">No response yet</code>
 
         <hr />
 
-        <h3>Open Request</h3>
-        <h5>POST http://tlc-locker/open</h5>
-        <table ng-form="openForm">
-            <tr>
-                <td>Locker ID</td>
-                <td><input type="text" ng-model="ctl.openRequest.LockerId" required /></td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><input type="button" value="Send Open Request" ng-click="ctl.doOpen()" ng-disabled="!openForm.$valid">
-                    </br />
-                </td>
-            </tr>
-        </table>
-
-        <h4> Request</h4>
-        <code ng-show="ctl.openRequest">{{ctl.openRequest}}</code>
-        <code ng-hide="ctl.openRequest">No request yet</code>
+        <h3>Get Device Id Request</h3>
+        <h5>AndroidInterface.getDeviceId</h5>
+        <input type="button" value="Execute" ng-click="ctl.getDeviceId()">
+        <br/>
 
         <h4> Response</h4>
-        <code ng-show="ctl.responseOpen">{{ctl.responseOpen}}</code>
-        <code ng-hide="ctl.responseOpen">No response yet</code>
+        <code ng-show="ctl.deviceId">{{ctl.deviceId}}</code>
+        <code ng-hide="ctl.deviceId">No response yet</code>
 
         <hr>
 
-        <h3>Lock Request</h3>
-        <h5>POST http://tlc-locker/lock</h5>
-        <table ng-form="lockRequestForm">
-            <tr>
-                <td>Locker ID</td>
-                <td><input type="text" ng-model="ctl.lockRequest.LockerId" required /></td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><input type="button" value="Send Lock Request" ng-click="ctl.doLock()" ng-disabled="!lockRequestForm.$valid">
-                    </br />
-                </td>
-            </tr>
-        </table>
-
-        <h4> Request</h4>
-        <code ng-show="ctl.lockRequest">{{ctl.lockRequest}}</code>
-        <code ng-hide="ctl.lockRequest">No request yet</code>
+        <h3>Get Application Version Request</h3>
+        <h5>AndroidInterface.getApplicationVersion</h5>
+        <input type="button" value="Execute" ng-click="ctl.getApplicationVersion()">
+        <br/>
 
         <h4> Response</h4>
-        <code ng-show="ctl.responseLock">{{ctl.responseLock}}</code>
-        <code ng-hide="ctl.responseLock">No response yet</code>
+        <code ng-show="ctl.applicationVersion">{{ctl.applicationVersion}}</code>
+        <code ng-hide="ctl.applicationVersion">No response yet</code>
 
-        <hr />
-
-        <h3>Status Request</h3>
-        <h5>POST http://tlc-locker/status</h5>
-        <table ng-form="statusRequestForm">
-            <tr>
-                <td>Locker ID</td>
-                <td><input type="text" ng-model="ctl.statusRequest.LockerId" required /></td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><input type="button" value="Send Status Request" ng-click="ctl.doStatus()" ng-disabled="!statusRequestForm.$valid">
-                    </br />
-                </td>
-            </tr>
-        </table>
-
-        <h4> Request</h4>
-        <code ng-show="ctl.statusRequest">{{ctl.statusRequest}}</code>
-        <code ng-hide="ctl.statusRequest">No request yet</code>
-
-        <h4> Response</h4>
-        <code ng-show="ctl.responseStatus">{{ctl.responseStatus}}</code>
-        <code ng-hide="ctl.responseStatus">No response yet</code>
-
-        <hr />
-
-        <h3>All Request</h3>
-        <h5>GET http://tlc-locker/all</h5>
-        <input type="button" value="Send All Request" ng-click="ctl.doAll()">
-        </br />
-
-        <h4> Request</h4>
-        <code>{}</code>
-
-        <h4> Response</h4>
-        <code ng-show="ctl.responseAll">{{ctl.responseAll}}</code>
-        <code ng-hide="ctl.responseAll">No response yet</code>
-
-        <hr />
-
-        <h3>Reset Request</h3>
-        <h5>GET http://tlc-locker/reset</h5>
-        <input type="button" value="Send Reset Request" ng-click="ctl.doReset()">
-        </br />
-
-        <h4> Request</h4>
-        <code>{}</code>
-
-        <h4> Response</h4>
-        <code ng-show="ctl.responseReset">{{ctl.responseStatus}}</code>
-        <code ng-hide="ctl.responseReset">No response yet</code>
-
-        <hr />
-
-        <h3>Settings Request</h3>
-        <h5>GET http://tlc-locker/settings</h5>
-        <input type="button" value="Send Settings Request" ng-click="ctl.doSettings()">
-        </br />
-
-        <h4> Request</h4>
-        <code>{}</code>
-
-        <h4> Response</h4>
-        <code ng-show="ctl.responseSettings">{{ctl.responseSettings}}</code>
-        <code ng-hide="ctl.responseSettings">No response yet</code>
-
-        <hr />
-
-        <h3>Info Request</h3>
-        <h5>GET http://tlc-locker/info</h5>
-        <input type="button" value="Send Info Request" ng-click="ctl.doInfo()">
-        </br />
-
-        <h4> Request</h4>
-        <code>{}</code>
-
-        <h4> Response</h4>
-        <code ng-show="ctl.responseInfo">{{ctl.responseInfo}}</code>
-        <code ng-hide="ctl.responseInfo">No response yet</code>
-
-        <hr />
-
-        <h3>Reload Request</h3>
-        <h5>GET http://tlc-locker/reload</h5>
-        <input type="button" value="Send Reload Request" ng-click="ctl.doReload()">
-        </br />
+        <hr>
     </div>
 
     <script type="text/javascript" src="./angular.min.js"></script>
