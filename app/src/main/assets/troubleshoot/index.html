@@ -41,6 +41,17 @@
         <code ng-hide="ctl.applicationVersion">No response yet</code>
 
         <hr>
+
+        <h3>Refresh Application Request</h3>
+        <h5>AndroidInterface.refreshApplication</h5>
+        <input type="button" value="Execute" ng-click="ctl.refreshApplication()">
+        <br/>
+
+        <h4> Response</h4>
+        <code ng-show="ctl.refreshApplicationResponse">{{ctl.refreshApplicationResponse}}</code>
+        <code ng-hide="ctl.refreshApplicationResponse">No response yet</code>
+
+        <hr>
     </div>
 
     <script type="text/javascript" src="./angular.min.js"></script>

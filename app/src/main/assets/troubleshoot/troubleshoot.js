@@ -10,7 +10,6 @@ angular.module("troubleshoot", []).controller("HomeController", ["$scope",  func
         }
         
         run.then((a) => {
-            alert(a);
             $scope.$apply(() => {                
                 context.barcodeResponse = a;
             });
@@ -45,6 +44,22 @@ angular.module("troubleshoot", []).controller("HomeController", ["$scope",  func
         run.then(function(a){
             $scope.$apply(() => {                
                 ctl.applicationVersion = a;
+            });
+        });
+    };
+
+    ctl.refreshApplication = function () {
+        var run = AndroidInterface.refreshApplication();
+        
+        run.then = function(callback){
+            var name = "callback_"+Math.floor((Math.random() * 100000));
+            window[name] = callback
+            return run.thenJS(name);
+        }
+        
+        run.then(function(a){
+            $scope.$apply(() => {                
+                ctl.refreshApplicationResponse = a;
             });
         });
     };
