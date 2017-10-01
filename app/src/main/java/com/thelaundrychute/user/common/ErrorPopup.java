@@ -22,14 +22,14 @@ public class ErrorPopup extends AlertDialog.Builder {
         super(context);
         this.mContext = context;
 
-        TranslationService t = TranslationService.getCurrent();
+        //TranslationService t = TranslationService.getCurrent();
         this.setTitle(title);
         this.setMessage(message);
 
         //this.dialogLayout = View.inflate(this.mContext, R.layout.dialog_login, null);
        // this.setView(this.dialogLayout);
 
-        this.setPositiveButton(t.get("Common.Ok"), new DialogInterface.OnClickListener() {
+        this.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
 
             @Override
             public void onClick(DialogInterface dialog, int which) {

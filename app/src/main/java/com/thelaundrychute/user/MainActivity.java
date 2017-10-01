@@ -2,15 +2,9 @@ package com.thelaundrychute.user;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.*;
-import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.ndk.CrashlyticsNdk;
-import com.inMotion.core.net.repositories.delegates.INetFunctionDelegate;
-import com.inMotion.core.net.repositories.funcs.FuncResponse;
-import com.inMotion.core.net.repositories.funcs.NetFunction;
-import com.inMotion.core.net.repositories.funcs.emptyFuncRequest;
 import com.inMotion.entities.common.app.AppVersion;
 import com.inMotion.ui.activities.BaseAppCompatActivity;
 import com.inMotion.ui.activities.IBaseActivity;
@@ -18,16 +12,10 @@ import com.thelaundrychute.business.common.Application;
 import com.thelaundrychute.business.common.ApplicationVersion;
 import com.thelaundrychute.business.common.ApplicationRepository;
 import com.thelaundrychute.business.common.delegates.ApplicationRepositoryDelegate;
-import com.thelaundrychute.business.user.Wash;
-import com.thelaundrychute.business.user.functions.getCurrent;
-import com.thelaundrychute.user.common.TranslationService;
 import com.thelaundrychute.user.common.UpdateService;
 import com.thelaundrychute.user.common.web.WebActivity;
 import com.thelaundrychute.user.common.web.WebPages;
-import com.thelaundrychute.user.user.UserHelper;
 //import com.thelaundrychute.user.wash.WashPagerActivity;
-
-import java.util.List;
 
 import io.fabric.sdk.android.Fabric;
 

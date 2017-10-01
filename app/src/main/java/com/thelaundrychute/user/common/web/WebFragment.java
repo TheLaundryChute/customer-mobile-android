@@ -25,19 +25,15 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Toast;
 
-import com.crashlytics.android.Crashlytics;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.inMotion.core.config.AppConfig;
 import com.inMotion.entities.common.app.AppVersion;
 import com.thelaundrychute.user.MainActivity;
 import com.thelaundrychute.user.common.GCMHelper;
-import com.thelaundrychute.user.common.PinAlertDialog;
 
 import com.thelaundrychute.user.common.fragments.FragmentIntentIntegrator;
 import com.thelaundrychute.user.test.R;
-import com.thelaundrychute.user.common.TranslationService;
-import com.thelaundrychute.user.user.UserHelper;
 
 import java.util.concurrent.Callable;
 
@@ -68,18 +64,15 @@ public class WebFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        TranslationService t = TranslationService.getCurrent();
         this.isBusy = new ProgressDialog(getActivity());
         this.isBusy.setTitle("Processing");
         this.isBusy.setMessage("Please wait");
         mWebTarget = (String) getArguments().getSerializable(ARG_WEB_TARGET);
-
-        com.inMotion.session.Context.init(getActivity());
-        if (com.inMotion.session.Context.getCurrent().getAuthorization() != null) {
-            setHasOptionsMenu(true);
-        }
-
-        this.validateUser();
+//
+//        com.inMotion.session.Context.init(getActivity());
+//        if (com.inMotion.session.Context.getCurrent().getAuthorization() != null) {
+//            setHasOptionsMenu(true);
+//        }
     }
 
     @Override
@@ -93,8 +86,6 @@ public class WebFragment extends Fragment {
                 });
         mWebView = (CustomWebView) view.findViewById(R.id.common_webview);
 		mWebView.setGestureDetector(gesture);
-
-        String uri = "";
         mWebView.setOnTouchListener(new View.OnTouchListener() {
             Handler handler = new Handler();
 
@@ -299,24 +290,6 @@ public class WebFragment extends Fragment {
             Toast.makeText(getActivity().getApplicationContext(), "Failed to Upload Image", Toast.LENGTH_LONG).show();
     }
 
-    private void validateUser() {
-
-        if (mWebTarget.contentEquals(WebPages.CUSTOMIZE) || mWebTarget.contentEquals(WebPages.BUY_PLAN) || mWebTarget.contentEquals(WebPages.PROFILE) || mWebTarget.contentEquals(WebPages.FEEDBACK)) {
-
-            final PinAlertDialog alert = new PinAlertDialog(this.getActivity(), UserHelper.getUser().getPin(), new PinAlertDialog.PinAlertDialogDelegate() {
-                @Override
-                public void pinEntryValidated() {
-                }
-
-                @Override
-                public void pinEntryCanceled() {
-                    getActivity().finish();
-                }
-            });
-        }
-
-    }
-
     public boolean onBackPressed() {
         if (mWebView.canGoBack()) {
             mWebView.goBack();
@@ -386,7 +359,6 @@ public class WebFragment extends Fragment {
             return new JSPromise(new Callable() {
                 @Override
                 public String call() throws Exception {
-                    mWebView.clearCache(true);
                     Intent i = new Intent(getActivity(), MainActivity.class);
                     startActivity(i);
                     getActivity().finish();
