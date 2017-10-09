@@ -32,6 +32,22 @@ angular.module("troubleshoot", []).controller("HomeController", ["$scope",  func
         });
     };
 
+    ctl.getDeviceInfo = function () {
+        var run = AndroidInterface.getDeviceInfo();
+        
+        run.then = function(callback){
+            var name = "callback_"+Math.floor((Math.random() * 100000));
+            window[name] = callback
+            return run.thenJS(name);
+        }
+        
+        run.then(function(a){
+            $scope.$apply(() => {                
+                ctl.deviceInfo = a;
+            });
+        });
+    };
+
     ctl.getApplicationVersion = function () {
         var run = AndroidInterface.getApplicationVersion();
         

@@ -29,6 +29,7 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.inMotion.core.config.AppConfig;
 import com.inMotion.entities.common.app.AppVersion;
+import com.inMotion.entities.user.profile.Device;
 import com.thelaundrychute.user.MainActivity;
 import com.thelaundrychute.user.common.GCMHelper;
 
@@ -313,11 +314,15 @@ public class WebFragment extends Fragment {
             return new JSPromise(new Callable() {
                 @Override
                 public String call() throws Exception {
-                    GCMHelper gcmRegistrationHelper = new GCMHelper(mContext.getApplicationContext());
-                    String projectNumber = getResources().getString(R.string.gcm_project_number);
-                    String gcmRegID = gcmRegistrationHelper.GCMRegister(projectNumber);
+                    try {
+                        GCMHelper gcmRegistrationHelper = new GCMHelper(mContext.getApplicationContext());
+                        String projectNumber = getResources().getString(R.string.gcm_project_number);
+                        String gcmRegID = gcmRegistrationHelper.GCMRegister(projectNumber);
 
-                    return gcmRegID;
+                        return gcmRegID;
+                    } catch(Exception ex) {
+                        return null;
+                    }
                 }
             }).setWebView(mWebview);
         }
@@ -367,6 +372,31 @@ public class WebFragment extends Fragment {
                 }
             }).setWebView(mWebview);
         }
+
+        @JavascriptInterface
+        public JSPromise getDeviceInfo() throws Exception {
+            return new JSPromise(new Callable() {
+                @Override
+                public Device call() throws Exception {
+                    try {
+                        GCMHelper gcmRegistrationHelper = new GCMHelper(mContext.getApplicationContext());
+                        String projectNumber = getResources().getString(R.string.gcm_project_number);
+                        String gcmRegID = gcmRegistrationHelper.GCMRegister(projectNumber);
+
+                        Device device = new Device();
+                        device.setId(gcmRegID);
+                        device.setType("android");
+                        device.setVersion(Build.VERSION.RELEASE);
+                        device.setAppVersion(AppVersion.appVersion(mContext));
+
+                        return device;
+                    } catch(Exception ex) {
+                        return null;
+                    }
+                }
+            }).setWebView(mWebview);
+        }
+
 
 
     }

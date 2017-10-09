@@ -8,6 +8,7 @@
 
 
     <uses-permission android:name="com.example.permission.MAPS_RECEIVE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -35,12 +36,6 @@
             android:value="AIzaSyBNLCwXk31sI7KoebBXoZAkhoCFCRXKd1k" />
 
         <activity
-            android:name="com.thelaundrychute.user.wash.WashPagerActivity"
-            android:label="@string/app_name"
-            android:launchMode="singleTask"
-            android:screenOrientation="portrait" />
-
-        <activity
             android:name="com.thelaundrychute.user.UpgradeActivity"
             android:screenOrientation="portrait">
             </activity>
@@ -50,9 +45,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"
             />
-        <activity
-            android:name="com.thelaundrychute.user.bag.BagScanActivity"
-            android:screenOrientation="portrait" />
+
         <activity
             android:name="com.thelaundrychute.user.MainActivity"
             android:label="@string/app_name"

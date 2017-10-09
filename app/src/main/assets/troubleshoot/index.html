@@ -20,6 +20,17 @@
 
         <hr />
 
+        <h3>Get Device Info Request</h3>
+        <h5>AndroidInterface.getDeviceInfo</h5>
+        <input type="button" value="Execute" ng-click="ctl.getDeviceInfo()">
+        <br/>
+
+        <h4> Response</h4>
+        <code ng-show="ctl.deviceInfo" style="overflow-wrap: break-word;">{{ctl.deviceInfo}}</code>
+        <code ng-hide="ctl.deviceInfo">No response yet</code>
+
+        <hr />
+
         <h3>Get Device Id Request</h3>
         <h5>AndroidInterface.getDeviceId</h5>
         <input type="button" value="Execute" ng-click="ctl.getDeviceId()">

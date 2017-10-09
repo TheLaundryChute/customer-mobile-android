@@ -1,5 +1,6 @@
 package com.thelaundrychute.user.common;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -54,7 +55,7 @@ public class NotificationListenerService extends GcmListenerService {
      */
     private void sendNotification(String subject, String content) {
         //Open the messages view
-        Intent intent = WebActivity.newIntent(this, WebPages.MESSAGES);
+        Intent intent = WebActivity.newIntent(this, WebPages.HOME);
 
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
@@ -67,6 +68,8 @@ public class NotificationListenerService extends GcmListenerService {
                 .setColor(color)
                 .setContentTitle(subject)
                 .setContentText(content)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(content))
+                .setPriority(Notification.PRIORITY_MAX)
                 .setAutoCancel(true)
                 .setSound(defaultSoundUri)
                 .setContentIntent(pendingIntent);
