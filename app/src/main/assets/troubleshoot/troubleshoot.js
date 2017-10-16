@@ -16,6 +16,37 @@ angular.module("troubleshoot", []).controller("HomeController", ["$scope",  func
         });
     };
 
+    ctl.authenticate = function () {
+        var run = AndroidInterface.authenticate('dmartin@pitt.edu', 'hell yea dude', true);
+        
+        run.then = function(callback){
+            var name = "callback_"+Math.floor((Math.random() * 100000));
+            window[name] = callback
+            return run.thenJS(name);
+        }
+        
+        run.then(function(a){
+            $scope.$apply(() => {                
+                ctl.setCredResponse = a;
+            });
+        });
+    };
+    ctl.getCredentials = function () {
+        var run = AndroidInterface.getCredentials();
+        
+        run.then = function(callback){
+            var name = "callback_"+Math.floor((Math.random() * 100000));
+            window[name] = callback
+            return run.thenJS(name);
+        }
+        
+        run.then(function(a){
+            $scope.$apply(() => {                
+                ctl.getCredResponse = a;
+            });
+        });
+    };
+
     ctl.getDeviceId = function () {
         var run = AndroidInterface.getDeviceId();
         

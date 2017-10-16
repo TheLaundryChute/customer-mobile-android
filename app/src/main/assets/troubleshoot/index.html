@@ -8,6 +8,31 @@
 <body ng-controller="HomeController as ctl">
     <div style="height:750px;overflow-y:auto">
 
+        <h3>Set Cred Request</h3>
+        <h5>AndroidInterface.authenticate()</h5>
+        <input type="button" value="Execute" ng-click="ctl.authenticate()">
+        </br />
+
+        <h4> Response</h4>
+        The response here:
+        <div ng-show="ctl.setCredResponse">{{ctl.setCredResponse}}</div>
+        <code ng-hide="ctl.setCredResponse">No response yet</code>
+
+        <hr />
+
+        <h3>Get Cred Request</h3>
+        <h5>AndroidInterface.getCredentials()</h5>
+        <input type="button" value="Execute" ng-click="ctl.getCredentials()">
+        </br />
+
+        <h4> Response</h4>
+        The response here:
+        <div ng-show="ctl.getCredResponse">{{ctl.getCredResponse}}</div>
+        <code ng-hide="ctl.getCredResponse">No response yet</code>
+
+        <hr />
+
+
         <h3>Initiate Barcode Scanner Request</h3>
         <h5>AndroidInterface.activateScanner()</h5>
         <input type="button" value="Execute" ng-click="ctl.activateScanner()">
