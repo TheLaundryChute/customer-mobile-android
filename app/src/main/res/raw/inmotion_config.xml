@@ -4,8 +4,8 @@
         <host>https://tlc.inmotionapptest.net/api/v1/</host>
         <web>https://tlc-v2.inmotionapptest.net/</web>
 
-        <!--<host>https://api.thelaundrychute.com/api/v1/</host>
-        <web>https://mobileweb.thelaundrychute.com/</web><!-->
+        <!--<host>https://tlc-mobile-v2.inmotionapp.net/api/v1/</host>
+        <web>https://tlc-mobile-v2.inmotionapp.net/</web>!-->
    </net>
    <clientId>ngAuthApp</clientId>
    <organization>tlc</organization>
