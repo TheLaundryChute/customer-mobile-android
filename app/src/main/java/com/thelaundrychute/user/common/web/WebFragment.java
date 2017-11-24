@@ -5,51 +5,47 @@ import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.webkit.GeolocationPermissions;
 import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Toast;
 
-import com.crashlytics.android.Crashlytics;
-import com.inMotion.core.Error;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 import com.inMotion.core.config.AppConfig;
-import com.inMotion.core.net.repositories.delegates.INetFunctionDelegate;
-import com.inMotion.core.net.repositories.funcs.FuncResponse;
-import com.inMotion.core.net.repositories.funcs.NetFunction;
-import com.inMotion.core.net.repositories.funcs.emptyFuncRequest;
-import com.thelaundrychute.business.user.functions.getCurrent;
-import com.thelaundrychute.user.bag.BagScanActivity;
-import com.thelaundrychute.user.bag.BagScanType;
-import com.thelaundrychute.user.common.ErrorPopup;
-import com.thelaundrychute.user.common.PinAlertDialog;
+import com.inMotion.entities.common.app.AppVersion;
+import com.inMotion.entities.user.profile.Device;
+import com.thelaundrychute.user.MainActivity;
+import com.thelaundrychute.user.common.GCMHelper;
 
+import com.thelaundrychute.user.common.fragments.FragmentIntentIntegrator;
 import com.thelaundrychute.user.test.R;
-import com.thelaundrychute.user.TLCLoginActivity;
-import com.thelaundrychute.user.common.Toolbar;
-import com.thelaundrychute.user.common.TranslationService;
-import com.thelaundrychute.user.user.UserHelper;
-//import com.thelaundrychute.user.wash.WashPagerActivity;
+
+import java.util.concurrent.Callable;
 
 public class WebFragment extends Fragment {
     public static final String ARG_WEB_TARGET = "web_target";
     private CustomWebView mWebView;
     private String mWebTarget;
+
+    private static String qr_data = "";
+    public static int WEB_APP = 0;
 
     private ValueCallback<Uri> mUploadMessage;
     public ValueCallback<Uri[]> uploadMessage;
@@ -70,62 +66,82 @@ public class WebFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        TranslationService t = TranslationService.getCurrent();
         this.isBusy = new ProgressDialog(getActivity());
         this.isBusy.setTitle("Processing");
         this.isBusy.setMessage("Please wait");
         mWebTarget = (String) getArguments().getSerializable(ARG_WEB_TARGET);
-
-        com.inMotion.session.Context.init(getActivity());
-        if (com.inMotion.session.Context.getCurrent().getAuthorization() != null) {
-            setHasOptionsMenu(true);
-        }
-
-        this.validateUser();
+//
+//        com.inMotion.session.Context.init(getActivity());
+//        if (com.inMotion.session.Context.getCurrent().getAuthorization() != null) {
+//            setHasOptionsMenu(true);
+//        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-        //TODO: We are going to need parameters here specific to a web view and what to render
-
         View view = inflater.inflate(R.layout.fragment_web, container, false);
-
-        //TODO: refactor to custom web view / client
-        final GestureDetector gesture = new GestureDetector(getActivity(),
+		final GestureDetector gesture = new GestureDetector(getActivity(),
                 new GestureDetector.SimpleOnGestureListener() {
 
-                    @Override
-                    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-                                           float velocityY) {
-                        //Log.i(Constants.APP_TAG, "onFling has been called!");
-                        final int SWIPE_MIN_DISTANCE = 120;
-                        final int SWIPE_MAX_OFF_PATH = 250;
-                        final int SWIPE_THRESHOLD_VELOCITY = 200;
-                        try {
-                            if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_OFF_PATH)
-                                return false;
-                            if (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE
-                                    && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-                                mWebView.goForward();
-                                // Log.i(Constants.APP_TAG, "Right to Left");
-                            } else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE
-                                    && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-                                getActivity().onBackPressed();
-                                //Log.i(SyncStateContract.Constants.APP_TAG, "Left to Right");
-                            }
-                        } catch (Exception e) {
-                            // nothing
-                        }
-                        return super.onFling(e1, e2, velocityX, velocityY);
-                    }
+                    
                 });
-
-
         mWebView = (CustomWebView) view.findViewById(R.id.common_webview);
-        mWebView.setGestureDetector(gesture);
+		mWebView.setGestureDetector(gesture);
+        mWebView.setOnTouchListener(new View.OnTouchListener() {
+            Handler handler = new Handler();
 
+            int numberOfTaps = 0;
+            long lastTapTimeMs = 0;
+            long touchDownMs = 0;
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        touchDownMs = System.currentTimeMillis();
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        //handler.removeCallbacksAndMessages(null);
+
+                        if ((System.currentTimeMillis() - touchDownMs) > ViewConfiguration.getTapTimeout()) {
+                            //it was not a tap
+
+                            numberOfTaps = 0;
+                            lastTapTimeMs = 0;
+                            break;
+                        }
+
+                        if (numberOfTaps > 0
+                                && (System.currentTimeMillis() - lastTapTimeMs) < ViewConfiguration.getDoubleTapTimeout()) {
+                            numberOfTaps += 1;
+                        } else {
+                            numberOfTaps = 1;
+                        }
+
+                        lastTapTimeMs = System.currentTimeMillis();
+
+                        if (numberOfTaps == 5) {
+                            if (applicationIsLoaded) {
+                                loadTroubleshoot();
+                            } else {
+                                loadApplication();
+                            }
+                            Toast.makeText(getActivity(), "Application Switch", Toast.LENGTH_SHORT).show();
+                            //handle triple tap
+                        }
+                }
+
+                return false;
+            }
+        });
+        mWebView.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                return false;
+            }
+        });
         mWebView.setWebChromeClient(new WebChromeClient() {
             public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
                 callback.invoke(origin, true, false);
@@ -151,7 +167,6 @@ public class WebFragment extends Fragment {
                 i.setType("image/*");
                 startActivityForResult(Intent.createChooser(i, "File Browser"), FILECHOOSER_RESULTCODE);
             }
-
 
             // For Lollipop 5.0+ Devices
             @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -197,42 +212,67 @@ public class WebFragment extends Fragment {
             }
         });
 
-        mWebView.getSettings().setJavaScriptEnabled(true);
+        WebSettings webSettings = mWebView.getSettings();
+
+        webSettings.setJavaScriptEnabled(true);
         // HTML5 API flags
-        mWebView.getSettings().setAppCacheEnabled(true);
-        mWebView.getSettings().setDatabaseEnabled(true);
-        mWebView.getSettings().setDomStorageEnabled(true);
-        mWebView.getSettings().setAllowFileAccess(true);
-        mWebView.getSettings().setAllowContentAccess(true);
+        webSettings.setAppCacheEnabled(true);
+        webSettings.setDatabaseEnabled(true);
+        webSettings.setDomStorageEnabled(true);
+        webSettings.setAllowFileAccess(true);
+        webSettings.setAllowContentAccess(true);
 
-        JavaScriptInterface jsInterface = new JavaScriptInterface(getActivity());
-        mWebView.addJavascriptInterface(jsInterface, "TLCAndroidInterface");
+        webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
+        if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
+            webSettings.setAllowFileAccessFromFileURLs(true);
+            webSettings.setAllowUniversalAccessFromFileURLs(true);
+        }
+        JavaScriptInterface jsInterface = new JavaScriptInterface(getActivity(), mWebView);
+        mWebView.addJavascriptInterface(jsInterface, "AndroidInterface");
 
+        loadApplication();
+
+        return view;
+    }
+
+    private boolean applicationIsLoaded = false;
+    private void loadApplication() {
         String token = "";
         if (com.inMotion.session.Context.getCurrent().getAuthorization() != null) {
             token = com.inMotion.session.Context.getCurrent().getAuthorization().getAccess_token();
         }
-
-        //String mainUrl = "http://mobileweb.thelaundrychute.com/webview/" + mWebTarget;
         String mainUrl = AppConfig.getCurrent().getNetwork().getWeb().toString() + mWebTarget;
-
-
+        //String mainUrl = "http://10.0.3.2:7161";
         String uri = Uri.parse(mainUrl)
                 .buildUpon()
-                        //.appendPath(mWebTarget)
                 .appendQueryParameter("isWebView", "true")
                 .appendQueryParameter("token", token)
                 .build().toString();
+        //
         mWebView.loadUrl(uri);
-        mWebView.setBackgroundColor(Color.argb(1, 0, 0, 0));
-        updateUI();
+        applicationIsLoaded = true;
+    }
 
-        return view;
+    private void loadTroubleshoot() {
+        String uri = "file:///android_asset/troubleshoot/index.html";
+        mWebView.loadUrl(uri);
+        applicationIsLoaded = false;
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent intent)
     {
+        IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
+        if (scanResult.getContents() == null) {
+            qr_data = null;
+        } else {
+
+            Uri uri = Uri.parse(scanResult.getContents());
+            qr_data = uri.getQueryParameter("bagId");
+        }
+        // HACK: This is used by javascript interface call back
+        WEB_APP = 0;
+
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
         {
             if (requestCode == REQUEST_SELECT_FILE)
@@ -257,28 +297,6 @@ public class WebFragment extends Fragment {
             Toast.makeText(getActivity().getApplicationContext(), "Failed to Upload Image", Toast.LENGTH_LONG).show();
     }
 
-    private void validateUser() {
-
-        if (mWebTarget.contentEquals(WebPages.CUSTOMIZE) || mWebTarget.contentEquals(WebPages.BUY_PLAN) || mWebTarget.contentEquals(WebPages.PROFILE) || mWebTarget.contentEquals(WebPages.FEEDBACK)) {
-
-            final PinAlertDialog alert = new PinAlertDialog(this.getActivity(), UserHelper.getUser().getPin(), new PinAlertDialog.PinAlertDialogDelegate() {
-                @Override
-                public void pinEntryValidated() {
-                }
-
-                @Override
-                public void pinEntryCanceled() {
-                    getActivity().finish();
-                }
-            });
-        }
-
-
-
-
-
-    }
-
     public boolean onBackPressed() {
         if (mWebView.canGoBack()) {
             mWebView.goBack();
@@ -288,120 +306,105 @@ public class WebFragment extends Fragment {
         }
     }
 
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        updateUI();
-    }
-
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-
-        inflater.inflate(R.menu.fragment_wash_list, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        return Toolbar.onOptionsItemSelected(getActivity(), item);
-    }
-
-
-
-    private void updateUI() {
-
-    }
-
-    public void successUserUpdate() {
-        getCurrent request = new getCurrent();
-
-        request.execute(null, new INetFunctionDelegate<emptyFuncRequest, getCurrent.response>() {
-            @Override
-            public void netFunctionDidFail(NetFunction<emptyFuncRequest, getCurrent.response> function, Error error) {
-                //Error
-                ErrorPopup errorPopup = new ErrorPopup(getActivity(), "Error", error.getMessage(), new ErrorPopup.ErrorPopupDelegate() {
-                    @Override
-                    public void alertClosed() {
-                        com.inMotion.session.Context.getCurrent().logout();
-                        Intent intent = new Intent(getActivity(), TLCLoginActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        getActivity().startActivity(intent);
-                        getActivity().finish();
-                    }
-                });
-                errorPopup.show();
-
-                Crashlytics.log(0, "BagScanFragment.getCurrent failed", error.getContext());
-
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-
-                        getActivity().finish();
-
-                    }
-                });
-
-            }
-
-            @Override
-            public void netFunctionDidSucceed(NetFunction<emptyFuncRequest, getCurrent.response> function, FuncResponse<getCurrent.response> result) {
-                getCurrent.response data = result.getData();
-                UserHelper.setUser(data.getUser());
-                UserHelper.setUserMessage(data.getDetails().getActionItem().getMessage());
-                UserHelper.setActionItem(data.getDetails().getActionItem());
-
-
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        isBusy.dismiss();
-                       // Intent intent = WashPagerActivity.newIntent(getActivity(), true);
-                        Intent intent = WebActivity.newIntent(getActivity(), WebPages.HOME);
-                        startActivity(intent);
-                    }
-                });
-            }
-        });
-    }
-
     public class JavaScriptInterface {
         Context mContext;
+        WebView mWebview;
 
-        /** Instantiate the interface and set the context */
-        JavaScriptInterface(Context c) {
+        public JavaScriptInterface(Context c, WebView webview) {
+            mWebview = webview;
             mContext = c;
         }
 
         @JavascriptInterface
-        public void loginActivity(String emailAddress)
-        {
-            Intent i = new Intent(getActivity(), TLCLoginActivity.class);
-            startActivity(i);
-            getActivity().finish();
-        }
-
-        @JavascriptInterface
-        public void dropOffScan(String bagId) {
-            // Called when a user select continue on the confirm wash page. All that is needed is the bagId).
-
-            Intent intent = BagScanActivity.newIntent(getActivity(), BagScanType.DROP_OFF_BAG, bagId, null);
-            startActivity(intent);
-            getActivity().finish();
-        }
-
-        @JavascriptInterface
-        public void closeActivity() {
-            getActivity().runOnUiThread(new Runnable() {
+        public JSPromise getDeviceId() throws Exception {
+            return new JSPromise(new Callable() {
                 @Override
-                public void run() {
-                    isBusy.show();
+                public String call() throws Exception {
+                    try {
+                        GCMHelper gcmRegistrationHelper = new GCMHelper(mContext.getApplicationContext());
+                        String projectNumber = getResources().getString(R.string.gcm_project_number);
+                        String gcmRegID = gcmRegistrationHelper.GCMRegister(projectNumber);
+
+                        return gcmRegID;
+                    } catch(Exception ex) {
+                        return null;
+                    }
                 }
-            });
-            successUserUpdate();
+            }).setWebView(mWebview);
         }
+
+        @JavascriptInterface
+        public JSPromise getApplicationVersion() throws Exception {
+            return new JSPromise(new Callable() {
+                @Override
+                public String call() throws Exception {
+                    return AppVersion.appVersion(mContext);
+                }
+            }).setWebView(mWebview);
+        }
+
+        @JavascriptInterface
+        public JSPromise activateScanner() {
+            return new JSPromise(new Callable() {
+                @Override
+                public String call() throws Exception {
+                    WEB_APP = 1;
+                    try {
+                        IntentIntegrator integrator = new FragmentIntentIntegrator(WebFragment.this);
+                        integrator.initiateScan();
+                    } catch(Exception ex) {
+                        Toast.makeText(mContext, "error: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+
+                    while(WEB_APP == 1) {
+                        Thread.sleep(200);
+                    }
+
+                     return qr_data;
+                }
+            }).setWebView(mWebview);
+        }
+
+        @JavascriptInterface
+        public JSPromise refreshApplication() throws Exception {
+            return new JSPromise(new Callable() {
+                @Override
+                public String call() throws Exception {
+                    Intent i = new Intent(getActivity(), MainActivity.class);
+                    startActivity(i);
+                    getActivity().finish();
+
+                    return "success";
+                }
+            }).setWebView(mWebview);
+        }
+
+        @JavascriptInterface
+        public JSPromise getDeviceInfo() throws Exception {
+            return new JSPromise(new Callable() {
+                @Override
+                public Device call() throws Exception {
+                    try {
+                        GCMHelper gcmRegistrationHelper = new GCMHelper(mContext.getApplicationContext());
+                        String projectNumber = getResources().getString(R.string.gcm_project_number);
+                        String gcmRegID = gcmRegistrationHelper.GCMRegister(projectNumber);
+
+                        Device device = new Device();
+                        device.setId(gcmRegID);
+                        device.setType("android");
+                        device.setVersion(Build.VERSION.RELEASE);
+                        device.setAppVersion(AppVersion.appVersion(mContext));
+
+                        return device;
+                    } catch(Exception ex) {
+                        return null;
+                    }
+                }
+            }).setWebView(mWebview);
+        }
+
+
+
     }
 
 }

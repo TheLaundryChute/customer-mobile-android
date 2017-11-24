@@ -25,7 +25,7 @@ public class UpgradeActivity extends Activity{
                 String str = "market://details?id=" + getPackageName();
                 Intent localIntent = new Intent("android.intent.action.VIEW");
                 localIntent.setData(Uri.parse(str));
-                startActivity(localIntent);
+                startActivity(Intent.createChooser(localIntent, "Google App Store"));
             }
         });
 

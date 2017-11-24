@@ -1,0 +1,97 @@
+<!doctype html>
+<html ng-app="troubleshoot">
+
+<head>
+
+</head>
+
+<body ng-controller="HomeController as ctl">
+    <div style="height:750px;overflow-y:auto">
+
+        <h3>Set Cred Request</h3>
+        <h5>AndroidInterface.authenticate()</h5>
+        <input type="button" value="Execute" ng-click="ctl.authenticate()">
+        </br />
+
+        <h4> Response</h4>
+        The response here:
+        <div ng-show="ctl.setCredResponse">{{ctl.setCredResponse}}</div>
+        <code ng-hide="ctl.setCredResponse">No response yet</code>
+
+        <hr />
+
+        <h3>Get Cred Request</h3>
+        <h5>AndroidInterface.getCredentials()</h5>
+        <input type="button" value="Execute" ng-click="ctl.getCredentials()">
+        </br />
+
+        <h4> Response</h4>
+        The response here:
+        <div ng-show="ctl.getCredResponse">{{ctl.getCredResponse}}</div>
+        <code ng-hide="ctl.getCredResponse">No response yet</code>
+
+        <hr />
+
+
+        <h3>Initiate Barcode Scanner Request</h3>
+        <h5>AndroidInterface.activateScanner()</h5>
+        <input type="button" value="Execute" ng-click="ctl.activateScanner()">
+        </br />
+
+        <h4> Response</h4>
+        The response here:
+        <div ng-show="ctl.barcodeResponse">{{ctl.barcodeResponse}}</div>
+        <code ng-hide="ctl.barcodeResponse">No response yet</code>
+
+        <hr />
+
+        <h3>Get Device Info Request</h3>
+        <h5>AndroidInterface.getDeviceInfo</h5>
+        <input type="button" value="Execute" ng-click="ctl.getDeviceInfo()">
+        <br/>
+
+        <h4> Response</h4>
+        <code ng-show="ctl.deviceInfo" style="overflow-wrap: break-word;">{{ctl.deviceInfo}}</code>
+        <code ng-hide="ctl.deviceInfo">No response yet</code>
+
+        <hr />
+
+        <h3>Get Device Id Request</h3>
+        <h5>AndroidInterface.getDeviceId</h5>
+        <input type="button" value="Execute" ng-click="ctl.getDeviceId()">
+        <br/>
+
+        <h4> Response</h4>
+        <code ng-show="ctl.deviceId">{{ctl.deviceId}}</code>
+        <code ng-hide="ctl.deviceId">No response yet</code>
+
+        <hr>
+
+        <h3>Get Application Version Request</h3>
+        <h5>AndroidInterface.getApplicationVersion</h5>
+        <input type="button" value="Execute" ng-click="ctl.getApplicationVersion()">
+        <br/>
+
+        <h4> Response</h4>
+        <code ng-show="ctl.applicationVersion">{{ctl.applicationVersion}}</code>
+        <code ng-hide="ctl.applicationVersion">No response yet</code>
+
+        <hr>
+
+        <h3>Refresh Application Request</h3>
+        <h5>AndroidInterface.refreshApplication</h5>
+        <input type="button" value="Execute" ng-click="ctl.refreshApplication()">
+        <br/>
+
+        <h4> Response</h4>
+        <code ng-show="ctl.refreshApplicationResponse">{{ctl.refreshApplicationResponse}}</code>
+        <code ng-hide="ctl.refreshApplicationResponse">No response yet</code>
+
+        <hr>
+    </div>
+
+    <script type="text/javascript" src="./angular.min.js"></script>
+    <script type="text/javascript" src="./troubleshoot.js"></script>
+</body>
+
+</html>

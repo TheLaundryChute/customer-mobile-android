@@ -6,8 +6,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     tools:context="com.thelaundrychute.user.NoInternetActivity"
-    android:background="#931E1A">
-
+    android:background="#4980a4">
     <include layout="@layout/content_no_internet" />
 
 </android.support.design.widget.CoordinatorLayout>

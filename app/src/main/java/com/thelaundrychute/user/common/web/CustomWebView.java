@@ -51,7 +51,7 @@ public final class CustomWebView extends WebView {
      */
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
-        return gestureDetector.onTouchEvent(ev) || super.onTouchEvent(ev);
+        return gestureDetector != null && gestureDetector.onTouchEvent(ev) || super.onTouchEvent(ev);
     }
 
     public void setGestureDetector(GestureDetector gestureDetector) {

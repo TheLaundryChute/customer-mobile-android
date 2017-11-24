@@ -56,7 +56,7 @@ public class NetworkManager {
             public void run() {
                 while(mIsRunning) {
 
-                    if (!isConnected(mContext)) {
+                    if (!isNetworkAvailable(mContext)) {
 
                         if (!mNoInternet) {
                             mNoInternet = true;
@@ -117,12 +117,23 @@ public class NetworkManager {
         this.mIsRunning = false;
     }
 
-    public static boolean isConnected(Context context) {
-        ConnectivityManager cm = (ConnectivityManager) context
-                .getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-
-        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+    public static boolean isNetworkAvailable(Context context) {
+        int[] networkTypes = {ConnectivityManager.TYPE_MOBILE,
+                ConnectivityManager.TYPE_WIFI};
+        try {
+            ConnectivityManager connectivityManager =
+                    (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+            for (int networkType : networkTypes) {
+                if (activeNetworkInfo != null &&
+                        activeNetworkInfo.isConnectedOrConnecting() &&
+                        activeNetworkInfo.getType() == networkType)
+                    return true;
+            }
+        } catch (Exception e) {
+            return false;
+        }
+        return false;
     }
 
 }

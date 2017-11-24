@@ -6,7 +6,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 
 import com.thelaundrychute.user.test.R;
-import com.thelaundrychute.user.common.Toolbar;
 
 
 public abstract class SingleFragmentActivity extends AppCompatActivity {
@@ -20,8 +19,6 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
 
         FragmentManager fm = getSupportFragmentManager();
         Fragment fragment = fm.findFragmentById(R.id.fragment_container);
-
-        Toolbar.init(this);
 
         if (fragment == null) {
             fragment = createFragment();
