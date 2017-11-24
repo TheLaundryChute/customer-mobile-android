@@ -122,7 +122,7 @@ public class WebFragment extends Fragment {
 
                         lastTapTimeMs = System.currentTimeMillis();
 
-                        if (numberOfTaps == 5) {
+                        if (false){ //numberOfTaps == 5) {
                             if (applicationIsLoaded) {
                                 loadTroubleshoot();
                             } else {
