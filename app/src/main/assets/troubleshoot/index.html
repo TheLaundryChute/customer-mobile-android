@@ -20,9 +20,21 @@
 
         <hr />
 
-        <h3>Get Cred Request</h3>
-        <h5>AndroidInterface.getCredentials()</h5>
-        <input type="button" value="Execute" ng-click="ctl.getCredentials()">
+        <h3>Logout Request</h3>
+        <h5>AndroidInterface.logout()</h5>
+        <input type="button" value="Execute" ng-click="ctl.logout()">
+        </br />
+
+        <h4> Response</h4>
+        The response here:
+        <div ng-show="ctl.logoutResponse">{{ctl.logoutResponse}}</div>
+        <code ng-hide="ctl.logoutResponse">No response yet</code>
+
+        <hr />
+
+        <h3>Get Token Request</h3>
+        <h5>AndroidInterface.token()</h5>
+        <input type="button" value="Execute" ng-click="ctl.token()">
         </br />
 
         <h4> Response</h4>

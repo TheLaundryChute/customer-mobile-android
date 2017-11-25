@@ -16,8 +16,24 @@ angular.module("troubleshoot", []).controller("HomeController", ["$scope",  func
         });
     };
 
+    ctl.logout = function () {
+        var run = AndroidInterface.logout();
+        
+        run.then = function(callback){
+            var name = "callback_"+Math.floor((Math.random() * 100000));
+            window[name] = callback
+            return run.thenJS(name);
+        }
+        
+        run.then(function(a){
+            $scope.$apply(() => {                
+                ctl.logoutResponse = a;
+            });
+        });
+    };
+
     ctl.authenticate = function () {
-        var run = AndroidInterface.authenticate('dmartin@pitt.edu', 'hell yea dude', true);
+        var run = AndroidInterface.authenticate('dmartin@pitt.edu', 'test123', true);
         
         run.then = function(callback){
             var name = "callback_"+Math.floor((Math.random() * 100000));
@@ -31,8 +47,8 @@ angular.module("troubleshoot", []).controller("HomeController", ["$scope",  func
             });
         });
     };
-    ctl.getCredentials = function () {
-        var run = AndroidInterface.getCredentials();
+    ctl.token = function () {
+        var run = AndroidInterface.token();
         
         run.then = function(callback){
             var name = "callback_"+Math.floor((Math.random() * 100000));
