@@ -318,9 +318,9 @@ public class WebFragment extends Fragment implements  GoogleApiClient.Connection
         if (com.inMotion.session.Context.getCurrent().getAuthorization() != null) {
             token = com.inMotion.session.Context.getCurrent().getAuthorization().getAccess_token();
         }
-        //String mainUrl = AppConfig.getCurrent().getNetwork().getWeb().toString() + mWebTarget;
+        String mainUrl = AppConfig.getCurrent().getNetwork().getWeb().toString() + mWebTarget;
         //String mainUrl = "http://10.0.3.2:7161";
-        String mainUrl = "http://localhost:7161";
+        //String mainUrl = "http://localhost:7161";
         String uri = Uri.parse(mainUrl)
                 .buildUpon()
                 .appendQueryParameter("isWebView", "true")
@@ -633,6 +633,7 @@ public class WebFragment extends Fragment implements  GoogleApiClient.Connection
                             e.printStackTrace();
                         }
                     }
+
                     if (delegate.getAuthResponse() != null) {
                         Credential credential = new Credential.Builder(username)
                                 .setName(username)
@@ -704,7 +705,7 @@ public class WebFragment extends Fragment implements  GoogleApiClient.Connection
 
         private void resolveResult(Status status, int requestCode) {
             Log.d(TAG, "Resolving: " + status);
-            if (status.hasResolution()) {
+x            if (status.hasResolution()) {
                 Log.d(TAG, "STATUS: RESOLVING");
                 try {
                     status.startResolutionForResult(getActivity(), requestCode);
