@@ -56,7 +56,6 @@ public class NotificationListenerService extends GcmListenerService {
     private void sendNotification(String subject, String content) {
         //Open the messages view
         Intent intent = WebActivity.newIntent(this, WebPages.HOME);
-
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
                 PendingIntent.FLAG_ONE_SHOT);

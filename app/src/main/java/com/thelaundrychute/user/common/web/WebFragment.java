@@ -96,7 +96,7 @@ public class WebFragment extends Fragment implements  GoogleApiClient.Connection
         this.isBusy.setMessage("Please wait");
         mWebTarget = (String) getArguments().getSerializable(ARG_WEB_TARGET);
 //      TODO: Testing
-      mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
+        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
                 .addConnectionCallbacks(this)
              //   .enableAutoManage(this, this)
                 .addApi(Auth.CREDENTIALS_API)
@@ -335,6 +335,14 @@ public class WebFragment extends Fragment implements  GoogleApiClient.Connection
         String uri = "file:///android_asset/troubleshoot/index.html";
         mWebView.loadUrl(uri);
         applicationIsLoaded = false;
+    }
+
+    public void onReceiveNotification() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+            mWebView.evaluateJavascript("enable();", null);
+        } else {
+            mWebView.loadUrl("javascript:enable();");
+        }
     }
 
     @Override
@@ -705,7 +713,7 @@ public class WebFragment extends Fragment implements  GoogleApiClient.Connection
 
         private void resolveResult(Status status, int requestCode) {
             Log.d(TAG, "Resolving: " + status);
-x            if (status.hasResolution()) {
+            if (status.hasResolution()) {
                 Log.d(TAG, "STATUS: RESOLVING");
                 try {
                     status.startResolutionForResult(getActivity(), requestCode);
