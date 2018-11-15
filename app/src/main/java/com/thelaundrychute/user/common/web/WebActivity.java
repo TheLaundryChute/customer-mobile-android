@@ -11,7 +11,7 @@ import com.thelaundrychute.user.common.fragments.SingleFragmentActivity;
 public class WebActivity extends SingleFragmentActivity {
 
 
-    private WebFragment mCurrentFragment;
+    private static WebFragment mCurrentFragment;
 
     public static Intent newIntent(Context context, String webTarget, String... args) {
         Intent intent = new Intent(context, WebActivity.class);
@@ -20,6 +20,10 @@ public class WebActivity extends SingleFragmentActivity {
         }
         intent.putExtra(WebFragment.ARG_WEB_TARGET, webTarget);
         return intent;
+    }
+
+    public static void onReceiveNotification(String message) {
+        mCurrentFragment.onReceiveNotification();;
     }
 
     protected void onNewIntent(Intent intent) {
@@ -36,8 +40,7 @@ public class WebActivity extends SingleFragmentActivity {
 
     @Override
     protected Fragment createFragment() {
-        String webTarget = (String) getIntent()
-                .getSerializableExtra(WebFragment.ARG_WEB_TARGET);
+        String webTarget = (String) getIntent().getSerializableExtra(WebFragment.ARG_WEB_TARGET);
         mCurrentFragment = WebFragment.newInstance(webTarget);
         return mCurrentFragment;
     }

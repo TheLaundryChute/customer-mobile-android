@@ -5,12 +5,15 @@ import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -26,11 +29,25 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.credentials.Credential;
+import com.google.android.gms.auth.api.credentials.CredentialRequest;
+import com.google.android.gms.auth.api.credentials.CredentialRequestResult;
+import com.google.android.gms.auth.api.credentials.IdentityProviders;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.CommonStatusCodes;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
+import com.inMotion.core.Error;
 import com.inMotion.core.config.AppConfig;
 import com.inMotion.entities.common.app.AppVersion;
+import com.inMotion.entities.user.User;
 import com.inMotion.entities.user.profile.Device;
+import com.inMotion.session.Authorization;
+import com.inMotion.session.IContextDelegate;
 import com.thelaundrychute.user.MainActivity;
 import com.thelaundrychute.user.common.GCMHelper;
 
@@ -39,10 +56,18 @@ import com.thelaundrychute.user.test.R;
 
 import java.util.concurrent.Callable;
 
-public class WebFragment extends Fragment {
+import static android.app.Activity.RESULT_OK;
+import static android.content.ContentValues.TAG;
+
+public class WebFragment extends Fragment implements  GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     public static final String ARG_WEB_TARGET = "web_target";
     private CustomWebView mWebView;
     private String mWebTarget;
+
+    private CredentialRequest credentialRequest;
+    private GoogleApiClient mGoogleApiClient;
+    private static final int RC_REQUEST = 11;
+    private static Credential credentials;
 
     private static String qr_data = "";
     public static int WEB_APP = 0;
@@ -70,24 +95,76 @@ public class WebFragment extends Fragment {
         this.isBusy.setTitle("Processing");
         this.isBusy.setMessage("Please wait");
         mWebTarget = (String) getArguments().getSerializable(ARG_WEB_TARGET);
+//      TODO: Testing
+        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
+                .addConnectionCallbacks(this)
+             //   .enableAutoManage(this, this)
+                .addApi(Auth.CREDENTIALS_API)
+                .build();
+
+        credentialRequest = new CredentialRequest.Builder().setSupportsPasswordLogin(true).build();
+
 //
-//        com.inMotion.session.Context.init(getActivity());
+        com.inMotion.session.Context.init(getActivity());
 //        if (com.inMotion.session.Context.getCurrent().getAuthorization() != null) {
 //            setHasOptionsMenu(true);
 //        }
     }
 
+    private void onCredentialSuccess(Credential credential) {
+        //TODO: This is where we can auto login by setting token and putting it into web view
+        Toast.makeText(getActivity(), credential.getPassword(), Toast.LENGTH_SHORT).show();
+        if (credential.getAccountType() == null) {
+            String id = credential.getId();
+            String username = credential.getName();
+            String password = credential.getPassword();
+
+            Log.d(TAG, "ID: " + id + ", Username: " + username + ", Password: " + password);
+            //usernameEditText.setText(username);
+            //passwordEditText.setText(password);
+
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mGoogleApiClient.disconnect();
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
+    }
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_web, container, false);
-		final GestureDetector gesture = new GestureDetector(getActivity(),
+        final GestureDetector gesture = new GestureDetector(getActivity(),
                 new GestureDetector.SimpleOnGestureListener() {
 
-                    
+
                 });
         mWebView = (CustomWebView) view.findViewById(R.id.common_webview);
-		mWebView.setGestureDetector(gesture);
+        mWebView.setGestureDetector(gesture);
         mWebView.setOnTouchListener(new View.OnTouchListener() {
             Handler handler = new Handler();
 
@@ -122,7 +199,7 @@ public class WebFragment extends Fragment {
 
                         lastTapTimeMs = System.currentTimeMillis();
 
-                        if (false){ //numberOfTaps == 5) {
+                        if (numberOfTaps == 5) {
                             if (applicationIsLoaded) {
                                 loadTroubleshoot();
                             } else {
@@ -152,7 +229,7 @@ public class WebFragment extends Fragment {
                 super.onReceivedTitle(view, title);
 
                 if (getActivity() != null && title != null && !TextUtils.isEmpty(title) && !title.contains(".com") &&
-                     !title.contains(".") &&!title.contains("The Laundry Chute")) {
+                        !title.contains(".") &&!title.contains("The Laundry Chute")) {
                     getActivity().setTitle(title);
                 }
             }
@@ -243,6 +320,7 @@ public class WebFragment extends Fragment {
         }
         String mainUrl = AppConfig.getCurrent().getNetwork().getWeb().toString() + mWebTarget;
         //String mainUrl = "http://10.0.3.2:7161";
+        //String mainUrl = "http://localhost:7161";
         String uri = Uri.parse(mainUrl)
                 .buildUpon()
                 .appendQueryParameter("isWebView", "true")
@@ -259,10 +337,26 @@ public class WebFragment extends Fragment {
         applicationIsLoaded = false;
     }
 
+    public void onReceiveNotification() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+            mWebView.evaluateJavascript("enable();", null);
+        } else {
+            mWebView.loadUrl("javascript:enable();");
+        }
+    }
+
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent intent)
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
-        IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
+        if (requestCode == RC_REQUEST) {
+            if (resultCode == RESULT_OK) {
+                Credential credential = data.getParcelableExtra(Credential.EXTRA_KEY);
+                onCredentialSuccess(credential);
+            } else {
+                credentials = null;
+            }
+        }
+        IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
         if (scanResult.getContents() == null) {
             qr_data = null;
         } else {
@@ -279,7 +373,7 @@ public class WebFragment extends Fragment {
             {
                 if (uploadMessage == null)
                     return;
-                uploadMessage.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode, intent));
+                uploadMessage.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode, data));
                 uploadMessage = null;
             }
         }
@@ -289,7 +383,7 @@ public class WebFragment extends Fragment {
                 return;
             // Use MainActivity.RESULT_OK if you're implementing WebView inside Fragment
             // Use RESULT_OK only if you're implementing WebView inside an Activity
-            Uri result = intent == null || resultCode != getActivity().RESULT_OK ? null : intent.getData();
+            Uri result = data == null || resultCode != getActivity().RESULT_OK ? null : data.getData();
             mUploadMessage.onReceiveValue(result);
             mUploadMessage = null;
         }
@@ -303,6 +397,76 @@ public class WebFragment extends Fragment {
             return true;
         } else {
             return false;
+        }
+    }
+
+    protected class WebLoginDelegate implements IContextDelegate {
+        private WebFragment _mFragment;
+        private Boolean mIsDone = false;
+        private String mToken = null;
+        private Authorization mAuthorization = null;
+
+        public WebLoginDelegate(WebFragment fragment) {
+            this.mIsDone = false;
+            this.mToken = null;
+            this.mAuthorization = null;
+            this._mFragment = fragment;
+        }
+
+        public Boolean isDone() {
+            return mIsDone;
+        }
+
+        public String getToken() {
+            return mToken;
+        }
+
+        public Authorization getAuthResponse() {
+            return mAuthorization;
+        }
+
+        @Override
+        public void contextLoginDidFail(com.inMotion.session.Context session, Error error) {
+            mToken = null;
+            mAuthorization = null;
+            mIsDone = true;
+        }
+
+        @Override
+        public void contextLoginDidSucceed(com.inMotion.session.Context session, User user) {
+            mToken = session.getAuthorization().getAccess_token();
+            mAuthorization = session.getAuthorization();
+            mIsDone = true;
+        }
+
+        @Override
+        public void contextRefreshWillHappen(com.inMotion.session.Context session) {
+
+        }
+
+        @Override
+        public void contextRefreshDidFail(com.inMotion.session.Context session, Error error) {
+
+        }
+
+        @Override
+        public void contextRefreshDidSucceed(com.inMotion.session.Context session, User user) {
+
+        }
+
+        @Override
+        public void contextUserDidUpdate(com.inMotion.session.Context session, User user) {
+
+        }
+
+        @Override
+        public void contextUserWillLogout(com.inMotion.session.Context session, User user) {
+
+        }
+
+        @Override
+        public void contextUserDidLogout(com.inMotion.session.Context session, User user) {
+
         }
     }
 
@@ -360,7 +524,7 @@ public class WebFragment extends Fragment {
                         Thread.sleep(200);
                     }
 
-                     return qr_data;
+                    return qr_data;
                 }
             }).setWebView(mWebview);
         }
@@ -402,6 +566,167 @@ public class WebFragment extends Fragment {
                 }
             }).setWebView(mWebview);
         }
+
+        @JavascriptInterface
+        public JSPromise token() throws Exception {
+            return new JSPromise(new Callable() {
+                @Override
+                public String call() throws Exception {
+
+                    final WebLoginDelegate delegate = new WebLoginDelegate(WebFragment.this);
+                    Auth.CredentialsApi.request(mGoogleApiClient, credentialRequest).setResultCallback( new ResultCallback<CredentialRequestResult>() {
+                        @Override
+                        public void onResult(CredentialRequestResult result) {
+                            Status status = result.getStatus();
+                            if (status.getStatus().isSuccess()) {
+                                Log.d(TAG, "GET: OK");
+                                credentials = result.getCredential();
+
+                                // GET TOKEN
+                                User user = new User(credentials.getName());
+                                user.setId(credentials.getId());
+                                com.inMotion.session.Context.getCurrent().login(user, credentials.getPassword());
+                                com.inMotion.session.Context.getCurrent().addResponder(delegate);
+                            } else {
+                                delegate.contextLoginDidFail(null, null);
+                                if (status.getStatusCode() == CommonStatusCodes.RESOLUTION_REQUIRED) {
+                                    try {
+                                        status.startResolutionForResult(getActivity(), RC_REQUEST);
+                                    } catch (IntentSender.SendIntentException e) {
+                                        Toast.makeText(getActivity(), "Save failed", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            }
+                        }
+                    });
+//                    while(WEB_APP == 1) {
+//                        Thread.sleep(200);
+//                    }
+                    while (!delegate.isDone()) {
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    return delegate.getToken();
+                }
+            }).setWebView(mWebview);
+        }
+
+        @JavascriptInterface
+        public JSPromise authenticate(final String username, final String password, final boolean rememberMe) throws Exception {
+            return new JSPromise(new Callable() {
+                @Override
+                public Authorization call() throws Exception {
+                    final WebLoginDelegate delegate = new WebLoginDelegate(WebFragment.this);
+
+                    try {
+                        //TODO: This method should auth against inmotion and return a token
+
+                        User user = new User(username);
+                        user.setId(username);
+                        com.inMotion.session.Context.getCurrent().login(user, password);
+                        com.inMotion.session.Context.getCurrent().addResponder(delegate);
+
+                    } catch(Exception ex) {
+
+                    }
+
+                    while (!delegate.isDone()) {
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    if (delegate.getAuthResponse() != null) {
+                        Credential credential = new Credential.Builder(username)
+                                .setName(username)
+                                .setPassword(password)
+                                .build();
+                        Auth.CredentialsApi.save(mGoogleApiClient, credential).setResultCallback(new ResultCallback<Status>() {
+                            @Override
+                            public void onResult(Status status) {
+                                if (status.isSuccess()) {
+                                    Log.d(TAG, "SAVE: OK");
+                                } else {
+                                    resolveResult(status, RC_REQUEST);
+                                }
+                            }
+                        });
+                    }
+                    return delegate.getAuthResponse();
+                }
+
+            }).setWebView(mWebview);
+        }
+
+        @JavascriptInterface
+        public JSPromise logout() throws Exception {
+            return new JSPromise(new Callable() {
+                @Override
+                public Boolean call() throws Exception {
+
+                    final boolean[] isComplete = {false};
+                    final boolean[] isLoggedOut = {false};
+                    try {
+                        Auth.CredentialsApi.request(mGoogleApiClient, credentialRequest).setResultCallback( new ResultCallback<CredentialRequestResult>() {
+                            @Override
+                            public void onResult(CredentialRequestResult result) {
+                                Status status = result.getStatus();
+                                if (status.getStatus().isSuccess()) {
+                                    Log.d(TAG, "GET: OK");
+                                    credentials = result.getCredential();
+                                    Auth.CredentialsApi.delete(mGoogleApiClient, credentials).setResultCallback(new ResultCallback<Status>() {
+                                        @Override
+                                        public void onResult(Status status) {
+                                            if (status.isSuccess()) {
+                                                Log.d(TAG, "LOGOUT: OK");
+                                                isComplete[0] = true;
+                                                isLoggedOut[0] = true;
+                                            } else {
+                                                Log.d(TAG, "LOGOUT: FAILED");
+                                                isComplete[0] = true;
+                                                isLoggedOut[0] = false;
+                                            }
+                                        }
+                                    });
+                                }
+                            }});
+                    } catch(Exception ex) {
+                        return null;
+                    }
+                    while (!isComplete[0]) {
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    return isLoggedOut[0];
+                }
+            }).setWebView(mWebview);
+        }
+
+        private void resolveResult(Status status, int requestCode) {
+            Log.d(TAG, "Resolving: " + status);
+            if (status.hasResolution()) {
+                Log.d(TAG, "STATUS: RESOLVING");
+                try {
+                    status.startResolutionForResult(getActivity(), requestCode);
+                } catch (IntentSender.SendIntentException e) {
+                    Log.e(TAG, "STATUS: Failed to send resolution.", e);
+
+                }
+            } else {
+                Log.e(TAG, "STATUS: FAIL");
+
+            }
+        }
+
 
 
 

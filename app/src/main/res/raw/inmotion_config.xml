@@ -1,7 +1,7 @@
 <inmotion>
     <net>
 
-        <host>https://tlc.inmotionapptest.net/api/v1/</host>
+        <host>https://tlc-v2.inmotionapptest.net/api/v1/</host>
         <web>https://tlc-v2.inmotionapptest.net/</web>
 
         <!--<host>https://tlc-mobile-v2.inmotionapp.net/api/v1/</host>
