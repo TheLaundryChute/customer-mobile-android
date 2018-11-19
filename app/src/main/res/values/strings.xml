@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">TLC Test</string>
+    <string name="app_name">TLC</string>
     <string name="gcm_project_number">325820962498</string>
     <string name="gcm_project_id">consumerapp-1161</string>
     <string name="hello_world">Hello world!</string>

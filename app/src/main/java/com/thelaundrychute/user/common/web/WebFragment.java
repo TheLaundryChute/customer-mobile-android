@@ -6,6 +6,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.pm.ApplicationInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -314,20 +315,17 @@ public class WebFragment extends Fragment implements  GoogleApiClient.Connection
 
     private boolean applicationIsLoaded = false;
     private void loadApplication() {
-        String token = "";
-        if (com.inMotion.session.Context.getCurrent().getAuthorization() != null) {
-            token = com.inMotion.session.Context.getCurrent().getAuthorization().getAccess_token();
-        }
-        String mainUrl = AppConfig.getCurrent().getNetwork().getWeb().toString() + mWebTarget;
+
+        //String mainUrl = AppConfig.getCurrent().getNetwork().getWeb().toString() + mWebTarget;
         //String mainUrl = "http://10.0.3.2:7161";
         //String mainUrl = "http://localhost:7161";
-        String uri = Uri.parse(mainUrl)
-                .buildUpon()
-                .appendQueryParameter("isWebView", "true")
-                .appendQueryParameter("token", token)
-                .build().toString();
-        //
+        String uri = "https://tlc-customer.web.thedevshoptest.app";
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            mWebView.setWebContentsDebuggingEnabled(true);
+        }
+        //mWebView.clearCache(true);
         mWebView.loadUrl(uri);
+
         applicationIsLoaded = true;
     }
 
